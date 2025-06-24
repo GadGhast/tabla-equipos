@@ -1,0 +1,54 @@
+{
+  "equipos": [
+    {
+      "id": "t1",
+      "name": "T1",
+      "value": 0
+    },
+    {
+      "id": "geng",
+      "name": "GenG",
+      "value": 0
+    },
+    {
+      "id": "bilibili",
+      "name": "BiliBili",
+      "value": 0
+    },
+    {
+      "id": "koi",
+      "name": "KOI",
+      "value": 0
+    },
+    {
+      "id": "g2",
+      "name": "G2",
+      "value": 0
+    },
+    {
+      "id": "fnatic",
+      "name": "Fnatic",
+      "value": 0
+    },
+    {
+      "id": "heretics",
+      "name": "Heretics",
+      "value": 0
+    },
+    {
+      "id": "astralis",
+      "name": "Astralis",
+      "value": 0
+    },
+    {
+      "id": "barca",
+      "name": "Barça",
+      "value": 0
+    },
+    {
+      "id": "madrid",
+      "name": "Madrid",
+      "value": 0
+    }
+  ]
+}
