@@ -1,63 +1,55 @@
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Tabla Dinámica de Equipos</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Tabla de Equipos</title>
   <style>
-    body { font-family: Arial, sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; background-color: #f4f4f9; }
-    table { width: 70%; border-collapse: collapse; margin: 20px 0; font-size: 18px; text-align: left; }
-    table th, table td { padding: 12px; border: 1px solid #ddd; }
-    table th { background-color: #ffa726; color: black; text-transform: uppercase; text-align: center; }
-    tbody tr td:first-child { background-color: #ffcc80; color: black; font-weight: bold; text-align: center; position: sticky; left: 0; z-index: 1; }
-    table tr:nth-child(even) { background-color: #f2f2f2; }
-    table tr:hover { background-color: #ddd; }
+    body { font-family: Arial, sans-serif; background: #f0f0f0; padding: 20px; }
+    table { width: 100%; border-collapse: collapse; background: white; }
+    th, td { padding: 10px; border: 1px solid #ccc; text-align: center; }
+    th { background-color: #007bff; color: white; }
   </style>
 </head>
 <body>
-  <table id="countriesTable">
+  <h1>Tabla de Equipos</h1>
+  <table id="tabla-equipos">
     <thead>
       <tr>
-        <th>Rank</th>
-        <th>Equipo</th>
-        <th>Puntos</th>
+        <th>ID</th>
+        <th>Nombre</th>
+        <th>Valor</th>
       </tr>
     </thead>
     <tbody></tbody>
   </table>
+
   <script>
-    const API_URL = '/data';
+    const API_URL = "https://round-aardvark-gadghast-f3174c45.koyeb.app/data"; // Sustituir por el dominio real
 
-    function formatNumber(n) {
-      return n.toLocaleString('es-ES');
-    }
-
-    function updateTable(countries) {
-      const tbody = document.querySelector('#countriesTable tbody');
-      tbody.innerHTML = '';
-      countries.sort((a, b) => b.value - a.value);
-      countries.forEach((c, i) => {
-        const row = tbody.insertRow();
-        row.insertCell().innerText = i + 1;
-        row.insertCell().innerText = c.name;
-        row.insertCell().innerText = formatNumber(c.value);
-        row.cells[2].setAttribute('data-value', c.value);
-      });
-    }
-
-    async function fetchAndUpdate() {
+    async function obtenerEquipos() {
       try {
         const res = await fetch(API_URL);
-        const data = await res.json();
-        updateTable(data);
-      } catch (e) {
-        console.error('Error fetching data:', e);
+        const equipos = await res.json();
+        const tbody = document.querySelector("#tabla-equipos tbody");
+        tbody.innerHTML = "";
+        equipos.forEach(equipo => {
+          const fila = document.createElement("tr");
+          fila.innerHTML = `
+            <td>${equipo.id}</td>
+            <td>${equipo.name}</td>
+            <td>${equipo.value}</td>
+          `;
+          tbody.appendChild(fila);
+        });
+      } catch (err) {
+        console.error("Error al obtener equipos:", err);
       }
     }
 
-    // Actualiza cada segundo
-    fetchAndUpdate();
-    setInterval(fetchAndUpdate, 1000);
+    setInterval(obtenerEquipos, 1000);
+    obtenerEquipos();
   </script>
 </body>
 </html>
