@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Tabla Dinámica de Equipos</title>
+  <style>
+    body { font-family: Arial, sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; background-color: #f4f4f9; }
+    table { width: 70%; border-collapse: collapse; margin: 20px 0; font-size: 18px; text-align: left; }
+    table th, table td { padding: 12px; border: 1px solid #ddd; }
+    table th { background-color: #ffa726; color: black; text-transform: uppercase; text-align: center; }
+    tbody tr td:first-child { background-color: #ffcc80; color: black; font-weight: bold; text-align: center; position: sticky; left: 0; z-index: 1; }
+    table tr:nth-child(even) { background-color: #f2f2f2; }
+    table tr:hover { background-color: #ddd; }
+  </style>
+</head>
+<body>
+  <table id="countriesTable">
+    <thead>
+      <tr>
+        <th>Rank</th>
+        <th>Equipo</th>
+        <th>Puntos</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+  <script>
+    const API_URL = '/data';
+
+    function formatNumber(n) {
+      return n.toLocaleString('es-ES');
+    }
+
+    function updateTable(countries) {
+      const tbody = document.querySelector('#countriesTable tbody');
+      tbody.innerHTML = '';
+      countries.sort((a, b) => b.value - a.value);
+      countries.forEach((c, i) => {
+        const row = tbody.insertRow();
+        row.insertCell().innerText = i + 1;
+        row.insertCell().innerText = c.name;
+        row.insertCell().innerText = formatNumber(c.value);
+        row.cells[2].setAttribute('data-value', c.value);
+      });
+    }
+
+    async function fetchAndUpdate() {
+      try {
+        const res = await fetch(API_URL);
+        const data = await res.json();
+        updateTable(data);
+      } catch (e) {
+        console.error('Error fetching data:', e);
+      }
+    }
+
+    // Actualiza cada segundo
+    fetchAndUpdate();
+    setInterval(fetchAndUpdate, 1000);
+  </script>
+</body>
+</html>
