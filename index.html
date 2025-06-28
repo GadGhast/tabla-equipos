@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Tabla de Equipos Gaming</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+  body {
+    font-family: 'Orbitron', sans-serif;
+    background: linear-gradient(135deg, #0b0c30 0%, #4b0082 100%);
+    color: #eee;
+    margin: 0;
+    padding: 50px 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  table {
+    border-collapse: collapse;
+    width: 700px;
+    background: rgba(30, 0, 60, 0.85);
+    border-radius: 15px;
+    box-shadow: 0 0 40px #8a2be2;
+    overflow: hidden;
+  }
+  th, td {
+    padding: 18px 24px;
+    text-align: left;
+    font-weight: 700;
+    font-size: 1.2rem;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+  }
+  th {
+    background: #3a006f;
+    letter-spacing: 2px;
+    font-size: 1.4rem;
+    text-transform: uppercase;
+    border-bottom: 2px solid #8a2be2;
+  }
+  tbody tr:nth-child(odd) {
+    background: rgba(75, 0, 130, 0.6);
+    transition: background 0.3s ease;
+  }
+  tbody tr:nth-child(even) {
+    background: rgba(11, 12, 48, 0.6);
+    transition: background 0.3s ease;
+  }
+  tbody tr:hover {
+    background: #8a2be2;
+    color: #fff;
+    cursor: pointer;
+  }
+  td img {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    margin-right: 12px;
+    vertical-align: middle;
+  }
+  td span.name {
+    vertical-align: middle;
+  }
+  .subscribers {
+    font-weight: 900;
+    font-size: 1.5rem;
+    display: inline-flex;
+    gap: 0;
+  }
+  .digit {
+    position: relative;
+    width: 20px; /* Tamaño compacto */
+    height: 28px;
+    overflow: hidden;
+    display: inline-block;
+    margin: 0 1px; /* Espaciado reducido */
+    text-align: center;
+    line-height: 28px;
+    font-size: 1.6rem;
+    font-weight: bold;
+    font-family: 'Orbitron', monospace;
+  }
+  .digit.decimal {
+    width: 10px; /* Más pequeño para el punto */
+    margin: 0 0.5px; /* Ajustado */
+  }
+  .digit-inner {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    transform: translateY(0);
+    transition: transform 0.6s cubic-bezier(0.22, 0.61, 0.36, 1);
+  }
+  .digit-inner span {
+    display: block;
+    height: 28px;
+    line-height: 28px;
+    font-size: 1.6rem;
+  }
+  .spin-up span {
+    color: #00ff88;
+  }
+  .spin-down span {
+    color: #ff0044;
+  }
+</style>
+</head>
+<body>
+  <table>
+    <thead>
+      <tr>
+        <th>RANKING</th>
+        <th>PAIS</th>
+        <th>POWER</th>
+      </tr>
+    </thead>
+    <tbody id="tabla-equipos-body">
+      <!-- filas se insertan aquí -->
+    </tbody>
+  </table>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="main.js"></script>
+</body>
+</html>
