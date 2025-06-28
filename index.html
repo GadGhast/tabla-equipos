@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Tabla de Equipos</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f4f4;
+      margin: 0;
+      padding: 20px;
+    }
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      max-width: 600px;
+      margin: auto;
+      background: white;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    th, td {
+      border: 1px solid #ccc;
+      padding: 10px;
+      text-align: center;
+    }
+    th {
+      background: #007bff;
+      color: white;
+    }
+    tr:nth-child(even) {
+      background: #f9f9f9;
+    }
+    tr.subiendo {
+      background-color: #d4edda !important;
+      transition: background-color 0.5s ease;
+    }
+    tr.bajando {
+      background-color: #f8d7da !important;
+      transition: background-color 0.5s ease;
+    }
+  </style>
+</head>
+<body>
+  <h2 style="text-align:center;">Tabla de Equipos</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Posición</th>
+        <th>Nombre</th>
+        <th>Puntuación</th>
+      </tr>
+    </thead>
+    <tbody id="tabla-equipos-body">
+      <!-- Filas generadas dinámicamente -->
+    </tbody>
+  </table>
+
+  <!-- Supabase JS SDK -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="main.js"></script>
+</body>
+</html>
