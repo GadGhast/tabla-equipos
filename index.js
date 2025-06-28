@@ -1,27 +1,31 @@
-// index.js
-const express = require('express');
-const { createClient } = require('@supabase/supabase-js');
-const path = require('path');
-const cors = require('cors');
+import express from 'express';
+import cors from 'cors';
+import dotenv from 'dotenv';
+import { createClient } from '@supabase/supabase-js';
+
+dotenv.config();
 
 const app = express();
 const port = process.env.PORT || 8000;
 
-// Reemplaza estas variables si no estás usando .env
-const SUPABASE_URL = 'https://rzkvdvfyfsecmqlmjbqb.supabase.co';
-const SUPABASE_KEY = 'DaWBjMHl7zBz8nOMgITc/PszT/RHavXypdJGP3VWTgWDrDaBVG/bGPw0ZPAzQBZZU1Yl6gpCX45AAcajUbeiiA=='; // Tu clave API
-
-const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
-
 app.use(cors());
-app.use(express.static('public'));
+app.use(express.json());
+
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseKey = process.env.SUPABASE_KEY;
+const supabase = createClient(supabaseUrl, supabaseKey);
 
 app.get('/data', async (req, res) => {
-  const { data, error } = await supabase.from('equipos').select('*');
-  if (error) {
-    return res.status(500).json({ error: error.message });
+  try {
+    const { data, error } = await supabase
+      .from('equipos')
+      .select('*');
+
+    if (error) throw error;
+    res.json(data);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
   }
-  res.json(data);
 });
 
 app.listen(port, () => {
