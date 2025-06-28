@@ -1,30 +1,29 @@
-require('dotenv').config();
+// index.js
 const express = require('express');
-const cors = require('cors');
 const { createClient } = require('@supabase/supabase-js');
+const path = require('path');
+const cors = require('cors');
 
 const app = express();
+const port = process.env.PORT || 8000;
+
+// Reemplaza estas variables si no estás usando .env
+const SUPABASE_URL = 'https://rzkvdvfyfsecmqlmjbqb.supabase.co';
+const SUPABASE_KEY = 'DaWBjMHl7zBz8nOMgITc/PszT/RHavXypdJGP3VWTgWDrDaBVG/bGPw0ZPAzQBZZU1Yl6gpCX45AAcajUbeiiA=='; // Tu clave API
+
+const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+
 app.use(cors());
-app.use(express.json());
+app.use(express.static('public'));
 
-const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY);
-
-// Obtener equipos
 app.get('/data', async (req, res) => {
-  const { data, error } = await supabase.from('equipos').select('*').order('id');
-  if (error) return res.status(500).json({ error: error.message });
+  const { data, error } = await supabase.from('equipos').select('*');
+  if (error) {
+    return res.status(500).json({ error: error.message });
+  }
   res.json(data);
 });
 
-// Actualizar puntuación
-app.post('/update', async (req, res) => {
-  const { id, value } = req.body;
-  const { error } = await supabase.from('equipos').update({ value }).eq('id', id);
-  if (error) return res.status(500).json({ error: error.message });
-  res.json({ success: true });
-});
-
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`Servidor corriendo en puerto ${PORT}`);
+app.listen(port, () => {
+  console.log(`Servidor funcionando en http://localhost:${port}`);
 });
