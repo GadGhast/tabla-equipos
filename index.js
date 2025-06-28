@@ -16,28 +16,20 @@ if (!supabaseUrl || !supabaseAnonKey) {
 
 const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
-// Servir archivos estáticos
 app.use(express.static('.'));
 
-// Endpoint para obtener datos de la tabla
 app.get('/data', async (req, res) => {
   const { data, error } = await supabase.from('equipos').select('*');
-
-  if (error) {
-    return res.status(500).json({ error: error.message });
-  }
+  if (error) return res.status(500).json({ error: error.message });
   res.json(data);
 });
 
-// Función para generar valores aleatorios entre -2 y 3
 function generarValorAleatorio() {
-  return Math.floor(Math.random() * 6) - 2; // Valores entre -2 y +3
+  return Math.floor(Math.random() * 6) - 2; // -2 a +3
 }
 
-// Función para actualizar los valores de la tabla "equipos"
 async function actualizarValores() {
   const { data: equipos, error } = await supabase.from('equipos').select('*');
-
   if (error) {
     console.error('Error al obtener equipos:', error);
     return;
@@ -53,24 +45,13 @@ async function actualizarValores() {
       .eq('id', equipo.id);
 
     if (updateError) {
-      console.error(`Error al actualizar el equipo ${equipo.name}:`, updateError);
-    } else {
-      console.log(
-        `El equipo ${equipo.name} ahora tiene un valor de ${nuevoValor} (Incremento: ${incremento})`
-      );
+      console.error(`Error al actualizar equipo ${equipo.id}:`, updateError);
     }
   }
-
-  // Generar un nuevo intervalo aleatorio entre 2 y 6 segundos
-  const nuevoIntervalo = Math.floor(Math.random() * 5 + 2) * 1000;
-  console.log(`Próxima actualización en ${nuevoIntervalo / 1000} segundos`);
-  setTimeout(actualizarValores, nuevoIntervalo);
 }
 
-// Iniciar la primera actualización
-actualizarValores();
+setInterval(actualizarValores, 5000);
 
-// Iniciar servidor
 app.listen(PORT, () => {
   console.log(`Servidor escuchando en http://localhost:${PORT}`);
 });
