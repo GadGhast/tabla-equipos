@@ -1,22 +1,28 @@
-// public/main.js
-async function obtenerDatos() {
+async function fetchEquipos() {
   try {
-    const respuesta = await fetch('/data');
-    const equipos = await respuesta.json();
-
-    const tbody = document.querySelector('#tabla-equipos tbody');
-    tbody.innerHTML = '';
-
-    equipos.forEach(equipo => {
-      const fila = document.createElement('tr');
-      fila.innerHTML = `<td>${equipo.name}</td><td>${equipo.value}</td>`;
-      tbody.appendChild(fila);
-    });
+    const response = await fetch('/data');
+    const equipos = await response.json();
+    actualizarTabla(equipos);
   } catch (error) {
     console.error('Error al obtener datos:', error);
   }
 }
 
-// Actualizar cada segundo
-setInterval(obtenerDatos, 1000);
-obtenerDatos();
+function actualizarTabla(equipos) {
+  const tbody = document.getElementById('tabla-equipos-body');
+  tbody.innerHTML = '';
+
+  equipos.forEach(equipo => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${equipo.id}</td>
+      <td>${equipo.name}</td>
+      <td>${equipo.value}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+setInterval(fetchEquipos, 1000); // refresco cada 1s
+
+fetchEquipos();
