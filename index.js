@@ -1,25 +1,34 @@
-const express = require('express');
-const cors = require('cors');
-const path = require('path');
-const { createClient } = require('@supabase/supabase-js');
-require('dotenv').config();
+import express from 'express';
+import cors from 'cors';
+import dotenv from 'dotenv';
+import { createClient } from '@supabase/supabase-js';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+dotenv.config();
+
+// Crear instancia de Supabase
+const supabase = createClient(
+  process.env.SUPABASE_URL,
+  process.env.SUPABASE_ANON_KEY
+);
 
 const app = express();
-const port = process.env.PORT || 8000;
+const PORT = process.env.PORT || 8000;
 
-// Supabase
-const supabaseUrl = process.env.SUPABASE_URL;
-const supabaseKey = process.env.SUPABASE_KEY;
-const supabase = createClient(supabaseUrl, supabaseKey);
+// Resolver __dirname con ESModules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
-// Middleware
-app.use(cors());
-app.use(express.static(path.join(__dirname, 'public'))); // servir HTML, JS, etc.
+// Servir archivos estáticos desde la raíz (donde está index.html, main.js, etc.)
+app.use(express.static(__dirname));
 
+// Ruta para index.html
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+  res.sendFile(path.join(__dirname, 'index.html'));
 });
 
+// Ruta para obtener datos desde Supabase
 app.get('/data', async (req, res) => {
   const { data, error } = await supabase
     .from('equipos')
@@ -27,13 +36,14 @@ app.get('/data', async (req, res) => {
     .order('value', { ascending: false });
 
   if (error) {
-    console.error('Error obteniendo datos:', error.message);
-    return res.status(500).json({ error: error.message });
+    console.error('Error al obtener datos de Supabase:', error.message);
+    return res.status(500).json({ error: 'Error al obtener datos de Supabase' });
   }
 
   res.json(data);
 });
 
-app.listen(port, () => {
-  console.log(`Servidor funcionando en http://localhost:${port}`);
+// Iniciar el servidor
+app.listen(PORT, () => {
+  console.log(`Servidor funcionando en http://localhost:${PORT}`);
 });
