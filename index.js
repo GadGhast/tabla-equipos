@@ -29,11 +29,9 @@ app.get('/data', async (req, res) => {
   res.json(data);
 });
 
-// Función para generar valores aleatorios con tendencia alcista
-function generarValoresConTendenciaAlcista() {
-  const baseIncremento = 2; // Incremento base para garantizar tendencia alcista
-  const fluctuacion = Math.floor(Math.random() * 21) - 10; // Rango entre -10 y 10
-  return baseIncremento + fluctuacion; // Resultado combinado
+// Función para generar valores aleatorios entre -2 y 3
+function generarValorAleatorio() {
+  return Math.floor(Math.random() * 6) - 2; // Valores entre -2 y +3
 }
 
 // Función para actualizar los valores de la tabla "equipos"
@@ -46,8 +44,7 @@ async function actualizarValores() {
   }
 
   for (const equipo of equipos) {
-    // Incrementar valor actual con tendencia alcista
-    const incremento = generarValoresConTendenciaAlcista();
+    const incremento = generarValorAleatorio();
     const nuevoValor = equipo.value + incremento;
 
     const { error: updateError } = await supabase
@@ -63,10 +60,15 @@ async function actualizarValores() {
       );
     }
   }
+
+  // Generar un nuevo intervalo aleatorio entre 2 y 6 segundos
+  const nuevoIntervalo = Math.floor(Math.random() * 5 + 2) * 1000;
+  console.log(`Próxima actualización en ${nuevoIntervalo / 1000} segundos`);
+  setTimeout(actualizarValores, nuevoIntervalo);
 }
 
-// Actualizar valores cada 2 segundos
-setInterval(actualizarValores, 2000);
+// Iniciar la primera actualización
+actualizarValores();
 
 // Iniciar servidor
 app.listen(PORT, () => {
