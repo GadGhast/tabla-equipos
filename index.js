@@ -1,49 +1,34 @@
-import express from 'express';
-import cors from 'cors';
-import dotenv from 'dotenv';
-import { createClient } from '@supabase/supabase-js';
-import path from 'path';
-import { fileURLToPath } from 'url';
+import express from 'express'
+import { createClient } from '@supabase/supabase-js'
+import dotenv from 'dotenv'
 
-dotenv.config();
+dotenv.config()
 
-// Crear instancia de Supabase
-const supabase = createClient(
-  process.env.SUPABASE_URL,
-  process.env.SUPABASE_ANON_KEY
-);
+const app = express()
+const PORT = process.env.PORT || 3000
 
-const app = express();
-const PORT = process.env.PORT || 8000;
+const supabaseUrl = process.env.SUPABASE_URL
+const supabaseAnonKey = process.env.SUPABASE_ANON_KEY
 
-// Resolver __dirname con ESModules
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+if (!supabaseUrl || !supabaseAnonKey) {
+  throw new Error('Faltan variables SUPABASE_URL o SUPABASE_ANON_KEY en .env')
+}
 
-// Servir archivos estáticos desde la raíz (donde está index.html, main.js, etc.)
-app.use(express.static(__dirname));
+const supabase = createClient(supabaseUrl, supabaseAnonKey)
 
-// Ruta para index.html
-app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'index.html'));
-});
+app.use(express.static('.'))
 
-// Ruta para obtener datos desde Supabase
 app.get('/data', async (req, res) => {
   const { data, error } = await supabase
     .from('equipos')
     .select('*')
-    .order('value', { ascending: false });
 
   if (error) {
-    console.error('Error al obtener datos de Supabase:', error.message);
-    return res.status(500).json({ error: 'Error al obtener datos de Supabase' });
+    return res.status(500).json({ error: error.message })
   }
+  res.json(data)
+})
 
-  res.json(data);
-});
-
-// Iniciar el servidor
 app.listen(PORT, () => {
-  console.log(`Servidor funcionando en http://localhost:${PORT}`);
-});
+  console.log(`Servidor escuchando en http://localhost:${PORT}`)
+})
