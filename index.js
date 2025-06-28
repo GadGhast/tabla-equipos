@@ -1,31 +1,37 @@
-import express from 'express';
-import cors from 'cors';
-import dotenv from 'dotenv';
-import { createClient } from '@supabase/supabase-js';
-
-dotenv.config();
+const express = require('express');
+const cors = require('cors');
+const path = require('path');
+const { createClient } = require('@supabase/supabase-js');
+require('dotenv').config();
 
 const app = express();
 const port = process.env.PORT || 8000;
 
-app.use(cors());
-app.use(express.json());
-
+// Supabase
 const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_KEY;
 const supabase = createClient(supabaseUrl, supabaseKey);
 
-app.get('/data', async (req, res) => {
-  try {
-    const { data, error } = await supabase
-      .from('equipos')
-      .select('*');
+// Middleware
+app.use(cors());
+app.use(express.static(path.join(__dirname, 'public'))); // servir HTML, JS, etc.
 
-    if (error) throw error;
-    res.json(data);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
+app.get('/data', async (req, res) => {
+  const { data, error } = await supabase
+    .from('equipos')
+    .select('*')
+    .order('value', { ascending: false });
+
+  if (error) {
+    console.error('Error obteniendo datos:', error.message);
+    return res.status(500).json({ error: error.message });
   }
+
+  res.json(data);
 });
 
 app.listen(port, () => {
