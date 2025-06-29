@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Tabla de Equipos Gaming</title>
+  <title>Tabla dAAe Equipos Gaming</title>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet" />
   <style>
     body {
@@ -70,32 +70,14 @@
       margin-right: 10px;
     }
     .digit {
-      display: inline-block;
-      position: relative;
-      width: 20px;
-      height: 28px;
-      overflow: hidden;
-      text-align: center;
-      line-height: 28px;
       font-size: 1.6rem;
       font-weight: bold;
-      font-family: 'Orbitron', monospace;
+      color: inherit;
     }
-    .digit-inner {
-      position: absolute;
-      top: 0;
-      left: 0;
-      transform: translateY(0);
-      transition: transform 0.6s ease-in-out;
-    }
-    .digit span {
-      display: block;
-      height: 28px;
-    }
-    .spin-up span {
+    .spin-up {
       color: #00ff88;
     }
-    .spin-down span {
+    .spin-down {
       color: #ff0044;
     }
   </style>
@@ -123,15 +105,17 @@
     const tbody = document.getElementById('tabla-equipos-body');
     const previousValues = new Map();
 
-    function animateNumberChange(oldValue, newValue) {
+    function createAnimatedNumber(oldValue, newValue) {
       const span = document.createElement('span');
-      span.textContent = newValue;
-      span.classList.add('digit');
+      span.textContent = newValue.toLocaleString('es-ES');
+      span.className = 'digit';
+
       if (newValue > oldValue) {
         span.classList.add('spin-up');
       } else if (newValue < oldValue) {
         span.classList.add('spin-down');
       }
+
       return span;
     }
 
@@ -151,26 +135,25 @@
       equipos.forEach((equipo) => {
         const tr = document.createElement('tr');
 
-        tr.innerHTML = `
-          <td>
-            <div class="country-container">
-              <img src="${equipo.image_url}" alt="${equipo.name}" class="country-flag" />
-              <span>${equipo.name}</span>
-            </div>
-          </td>
+        const oldValue = previousValues.get(equipo.id) ?? equipo.value;
+
+        const countryCell = document.createElement('td');
+        countryCell.innerHTML = `
+          <div class="country-container">
+            <img src="${equipo.image_url}" alt="${equipo.name}" class="country-flag" />
+            <span>${equipo.name}</span>
+          </div>
         `;
 
-        const tdValue = document.createElement('td');
-        const oldValue = previousValues.get(equipo.id) ?? 0;
-        const newValue = equipo.value;
+        const valueCell = document.createElement('td');
+        valueCell.appendChild(createAnimatedNumber(oldValue, equipo.value));
 
-        const numberSpan = animateNumberChange(oldValue, newValue);
-        tdValue.appendChild(numberSpan);
+        tr.appendChild(countryCell);
+        tr.appendChild(valueCell);
 
-        tr.appendChild(tdValue);
         tbody.appendChild(tr);
 
-        previousValues.set(equipo.id, newValue);
+        previousValues.set(equipo.id, equipo.value);
       });
     }
 
