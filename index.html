@@ -31,17 +31,23 @@
       font-size: 1.2rem;
       border-bottom: 1px solid rgba(255,255,255,0.1);
     }
+    thead th:nth-child(1),
+    thead th:nth-child(2) {
+      font-size: 1.55rem;
+    }
     thead th {
       background: #3a006f;
       letter-spacing: 2px;
-      font-size: 1.55rem;
+      font-size: 1.4rem;
       text-transform: uppercase;
       border-bottom: 2px solid #8a2be2;
     }
-    tbody td:nth-child(1) {
+    tbody td:nth-child(1),
+    thead th:nth-child(1) {
       font-size: 1.6rem;
     }
-    tbody td:nth-child(2) {
+    tbody td:nth-child(2),
+    thead th:nth-child(2) {
       font-size: 1.55rem;
     }
     tbody tr:nth-child(odd) {
@@ -63,24 +69,35 @@
       border-radius: 50%;
       margin-right: 12px;
       vertical-align: middle;
-      object-fit: cover; /* Mantiene la proporción */
-      object-position: center; /* Centra la imagen */
     }
     td span.name {
       vertical-align: middle;
     }
-    .spin-up span {
-      color: #00ff88;
+    .subscribers {
+      font-weight: 900;
+      font-size: 1.5rem;
+      display: inline-flex;
+      gap: 0;
     }
-    .spin-down span {
-      color: #ff0044;
+    .digit {
+      position: relative;
+      width: 20px;
+      height: 28px;
+      overflow: hidden;
+      display: inline-block;
+      margin: 0 1px;
+      text-align: center;
+      line-height: 28px;
+      font-size: 1.6rem;
+      font-weight: bold;
+      font-family: 'Orbitron', monospace;
     }
     .flash {
       animation: flash 1s linear;
     }
     @keyframes flash {
       0%, 100% { background-color: transparent; }
-      50% { background-color: #8a2be2; }
+      50% { background-color: #8a2be2; color: #fff; }
     }
   </style>
 </head>
@@ -119,23 +136,26 @@
 
       const newOrder = equipos.map(e => e.id);
 
-      tbody.innerHTML = '';
       equipos.forEach((equipo, index) => {
-        const tr = document.createElement('tr');
+        const oldIndex = previousOrder.indexOf(equipo.id);
 
-        const tdName = document.createElement('td');
-        tdName.innerHTML = `<img src="${equipo.image}" alt="${equipo.name}"> ${equipo.name}`;
+        // Crear o actualizar filas
+        let tr = document.querySelector(`#row-${equipo.id}`);
+        if (!tr) {
+          tr = document.createElement('tr');
+          tr.id = `row-${equipo.id}`;
+          tr.innerHTML = `
+            <td>
+              <img src="${equipo.image}" alt="${equipo.name}" />
+              ${equipo.name}
+            </td>
+            <td>${equipo.value}</td>
+          `;
+          tbody.appendChild(tr);
+        }
 
-        const tdValue = document.createElement('td');
-        tdValue.textContent = equipo.value;
-
-        tr.appendChild(tdName);
-        tr.appendChild(tdValue);
-        tbody.appendChild(tr);
-
-        // Efecto flash sólo en equipos que suben de posición
-        const previousIndex = previousOrder.indexOf(equipo.id);
-        if (previousIndex !== -1 && previousIndex > index) {
+        // Detectar cambio de posición
+        if (oldIndex !== -1 && oldIndex > index) {
           tr.classList.add('flash');
           setTimeout(() => tr.classList.remove('flash'), 1000);
         }
