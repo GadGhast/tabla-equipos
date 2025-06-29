@@ -88,12 +88,9 @@ async function fetchAndUpdate() {
   equipos.forEach((equipo) => {
     const tr = document.createElement('tr');
 
-    // Solo dos columnas: país y power
+    // Solo dos columnas: nombre y valor animado (sin imágenes)
     tr.innerHTML = `
-      <td>
-        <img src="${equipo.flag_url}" alt="${equipo.name}" />
-        <span class="name">${equipo.name}</span>
-      </td>
+      <td><span class="name">${equipo.name}</span></td>
     `;
 
     const tdValue = document.createElement('td');
