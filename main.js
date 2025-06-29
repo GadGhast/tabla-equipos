@@ -74,6 +74,8 @@ function animateNumber(oldNum, newNum) {
   return digitsContainer;
 }
 
+const flashTimeouts = new Map();
+
 async function fetchAndUpdate() {
   const { data: equipos, error } = await client
     .from('equipos')
@@ -105,17 +107,24 @@ async function fetchAndUpdate() {
 
     tdValue.appendChild(animateNumber(oldValue, newValue));
     tr.appendChild(tdValue);
-	
-	const oldPosition = previousPositions.get(equipo.id) ?? index;
-    if (oldPosition > index) {
-      tr.classList.add('flash');
-      setTimeout(() => tr.classList.remove('flash'), 1000); // Eliminar el efecto después de 1 segundo.
+
+    const oldPosition = previousPositions.get(equipo.id);
+    if (oldPosition !== undefined && oldPosition > index) {
+      // Evitar múltiples flashes simultáneos en Android
+      if (!flashTimeouts.has(equipo.id)) {
+        tr.classList.add('flash');
+        const timeoutId = setTimeout(() => {
+          tr.classList.remove('flash');
+          flashTimeouts.delete(equipo.id);
+        }, 500);
+        flashTimeouts.set(equipo.id, timeoutId);
+      }
     }
 
     tbody.appendChild(tr);
 
     previousValues.set(equipo.id, newValue);
-	previousPositions.set(equipo.id, index);
+    previousPositions.set(equipo.id, index);
   });
 }
 
