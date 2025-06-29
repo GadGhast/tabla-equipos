@@ -5,6 +5,8 @@ const client = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 const tbody = document.getElementById('tabla-equipos-body');
 const previousValues = new Map();
+const previousPositions = new Map();
+
 
 function formatNumberToDigits(num) {
   return num.toLocaleString('es-ES').split('');
@@ -85,7 +87,7 @@ async function fetchAndUpdate() {
 
   tbody.innerHTML = '';
 
-  equipos.forEach((equipo) => {
+  equipos.forEach((equipo, index) => {
     const tr = document.createElement('tr');
 
     tr.innerHTML = `
@@ -103,10 +105,17 @@ async function fetchAndUpdate() {
 
     tdValue.appendChild(animateNumber(oldValue, newValue));
     tr.appendChild(tdValue);
+	
+	const oldPosition = previousPositions.get(equipo.id) ?? index;
+    if (oldPosition > index) {
+      tr.classList.add('flash');
+      setTimeout(() => tr.classList.remove('flash'), 1000); // Eliminar el efecto después de 1 segundo
+    }
 
     tbody.appendChild(tr);
 
     previousValues.set(equipo.id, newValue);
+	previousPositions.set(equipo.id, index);
   });
 }
 
