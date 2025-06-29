@@ -65,46 +65,32 @@
     .country-flag {
       width: 36px;
       height: 36px;
-      border-radius: 50%; /* Hace las imágenes redondas */
-      object-fit: cover; /* Asegura que la imagen no se distorsione */
+      border-radius: 50%;
+      object-fit: cover;
       margin-right: 10px;
     }
-    .subscribers {
-      font-weight: 900;
-      font-size: 1.5rem;
-      display: inline-flex;
-      gap: 0;
-    }
     .digit {
+      display: inline-block;
       position: relative;
-      width: 20px; /* Tamaño compacto */
+      width: 20px;
       height: 28px;
       overflow: hidden;
-      display: inline-block;
-      margin: 0 1px; /* Espaciado reducido */
       text-align: center;
       line-height: 28px;
       font-size: 1.6rem;
       font-weight: bold;
       font-family: 'Orbitron', monospace;
     }
-    .digit.decimal {
-      width: 10px; /* Más pequeño para el punto */
-      margin: 0 0.5px; /* Ajustado */
-    }
     .digit-inner {
       position: absolute;
       top: 0;
       left: 0;
-      width: 100%;
       transform: translateY(0);
-      transition: transform 0.6s cubic-bezier(0.22, 0.61, 0.36, 1);
+      transition: transform 0.6s ease-in-out;
     }
-    .digit-inner span {
+    .digit span {
       display: block;
       height: 28px;
-      line-height: 28px;
-      font-size: 1.6rem;
     }
     .spin-up span {
       color: #00ff88;
@@ -137,8 +123,16 @@
     const tbody = document.getElementById('tabla-equipos-body');
     const previousValues = new Map();
 
-    function formatNumberToDigits(num) {
-      return num.toLocaleString('es-ES').split('');
+    function animateNumberChange(oldValue, newValue) {
+      const span = document.createElement('span');
+      span.textContent = newValue;
+      span.classList.add('digit');
+      if (newValue > oldValue) {
+        span.classList.add('spin-up');
+      } else if (newValue < oldValue) {
+        span.classList.add('spin-down');
+      }
+      return span;
     }
 
     async function fetchAndUpdate() {
@@ -170,9 +164,10 @@
         const oldValue = previousValues.get(equipo.id) ?? 0;
         const newValue = equipo.value;
 
-        tdValue.textContent = newValue;
-        tr.appendChild(tdValue);
+        const numberSpan = animateNumberChange(oldValue, newValue);
+        tdValue.appendChild(numberSpan);
 
+        tr.appendChild(tdValue);
         tbody.appendChild(tr);
 
         previousValues.set(equipo.id, newValue);
