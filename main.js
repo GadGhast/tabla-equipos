@@ -109,7 +109,7 @@ async function fetchAndUpdate() {
 	const oldPosition = previousPositions.get(equipo.id) ?? index;
     if (oldPosition > index) {
       tr.classList.add('flash');
-      setTimeout(() => tr.classList.remove('flash'), 1000); // Eliminar el efecto después de 1 segundo
+      setTimeout(() => tr.classList.remove('flash'), 1000); // Eliminar el efecto después de 1 segundo.
     }
 
     tbody.appendChild(tr);
