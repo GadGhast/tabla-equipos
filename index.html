@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Tabla dAAe Equipos Gaming</title>
+  <title>Tabla de Equipos Gaming</title>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet" />
   <style>
     body {
@@ -70,14 +70,36 @@
       margin-right: 10px;
     }
     .digit {
+      position: relative;
+      width: 20px;
+      height: 28px;
+      overflow: hidden;
+      display: inline-block;
+      margin: 0 1px;
+      text-align: center;
+      line-height: 28px;
       font-size: 1.6rem;
       font-weight: bold;
-      color: inherit;
+      font-family: 'Orbitron', monospace;
     }
-    .spin-up {
+    .digit-inner {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      transform: translateY(0);
+      transition: transform 0.6s cubic-bezier(0.22, 0.61, 0.36, 1);
+    }
+    .digit-inner span {
+      display: block;
+      height: 28px;
+      line-height: 28px;
+      font-size: 1.6rem;
+    }
+    .spin-up span {
       color: #00ff88;
     }
-    .spin-down {
+    .spin-down span {
       color: #ff0044;
     }
   </style>
@@ -101,22 +123,62 @@
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBjbnJ3cnR0amJ3YW5uZWRhbWtpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA4NTkwODUsImV4cCI6MjA2NjQzNTA4NX0.j62o4rP8afaRiaMyfX-UTze5B8ftgRgpwrGLq4FEvcs';
 
     const client = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
     const tbody = document.getElementById('tabla-equipos-body');
     const previousValues = new Map();
 
-    function createAnimatedNumber(oldValue, newValue) {
-      const span = document.createElement('span');
-      span.textContent = newValue.toLocaleString('es-ES');
-      span.className = 'digit';
+    function createDigitElement(oldChar, newChar, direction, delay) {
+      const digit = document.createElement('span');
+      digit.className = 'digit';
 
-      if (newValue > oldValue) {
-        span.classList.add('spin-up');
-      } else if (newValue < oldValue) {
-        span.classList.add('spin-down');
+      const inner = document.createElement('div');
+      inner.className = 'digit-inner';
+
+      const oldSpan = document.createElement('span');
+      oldSpan.textContent = oldChar;
+      const newSpan = document.createElement('span');
+      newSpan.textContent = newChar;
+
+      if (direction === 'up') {
+        digit.classList.add('spin-up');
+        inner.appendChild(oldSpan);
+        inner.appendChild(newSpan);
+        inner.style.transform = 'translateY(0)';
+        setTimeout(() => {
+          inner.style.transform = 'translateY(-28px)';
+        }, 50);
+      } else {
+        digit.classList.add('spin-down');
+        inner.appendChild(newSpan);
+        inner.appendChild(oldSpan);
+        inner.style.transform = 'translateY(-28px)';
+        setTimeout(() => {
+          inner.style.transform = 'translateY(0)';
+        }, 50);
       }
 
-      return span;
+      digit.appendChild(inner);
+      return digit;
+    }
+
+    function animateNumber(oldNum, newNum) {
+      const oldChars = oldNum.toString().padStart(6, '0').split('');
+      const newChars = newNum.toString().padStart(6, '0').split('');
+      const fragment = document.createDocumentFragment();
+
+      oldChars.forEach((oldChar, index) => {
+        const newChar = newChars[index];
+        if (oldChar === newChar) {
+          const span = document.createElement('span');
+          span.className = 'digit';
+          span.textContent = newChar;
+          fragment.appendChild(span);
+        } else {
+          const direction = newChar > oldChar ? 'up' : 'down';
+          fragment.appendChild(createDigitElement(oldChar, newChar, direction, index * 60));
+        }
+      });
+
+      return fragment;
     }
 
     async function fetchAndUpdate() {
@@ -146,7 +208,7 @@
         `;
 
         const valueCell = document.createElement('td');
-        valueCell.appendChild(createAnimatedNumber(oldValue, equipo.value));
+        valueCell.appendChild(animateNumber(oldValue, equipo.value));
 
         tr.appendChild(countryCell);
         tr.appendChild(valueCell);
