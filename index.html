@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>MUNDIAL FIGHTWARS</title>
+  <title>Tabla de Equipos Gaming</title>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet" />
   <style>
     body {
@@ -62,13 +62,6 @@
       display: flex;
       align-items: center;
     }
-    .country-flag {
-      width: 36px;
-      height: 36px;
-      border-radius: 50%; /* Hace las imágenes redondas */
-      object-fit: cover; /* Asegura que la imagen no se distorsione */
-      margin-right: 10px;
-    }
     .subscribers {
       font-weight: 900;
       font-size: 1.5rem;
@@ -87,10 +80,6 @@
       font-size: 1.6rem;
       font-weight: bold;
       font-family: 'Orbitron', monospace;
-    }
-    .digit.decimal {
-      width: 10px; /* Más pequeño para el punto */
-      margin: 0 0.5px; /* Ajustado */
     }
     .digit-inner {
       position: absolute;
@@ -137,8 +126,36 @@
     const tbody = document.getElementById('tabla-equipos-body');
     const previousValues = new Map();
 
-    function formatNumberToDigits(num) {
-      return num.toLocaleString('es-ES').split('');
+    function createDigitElement(oldChar, newChar, direction, delay) {
+      const digit = document.createElement('span');
+      digit.className = 'digit';
+      const inner = document.createElement('div');
+      inner.className = 'digit-inner';
+
+      const oldSpan = document.createElement('span');
+      oldSpan.textContent = oldChar;
+      const newSpan = document.createElement('span');
+      newSpan.textContent = newChar;
+
+      if (direction === 'up') {
+        digit.classList.add('spin-up');
+        inner.appendChild(oldSpan);
+        inner.appendChild(newSpan);
+        inner.style.transform = 'translateY(0)';
+        setTimeout(() => {
+          inner.style.transform = 'translateY(-28px)';
+        }, delay);
+      } else if (direction === 'down') {
+        digit.classList.add('spin-down');
+        inner.appendChild(newSpan);
+        inner.appendChild(oldSpan);
+        inner.style.transform = 'translateY(-28px)';
+        setTimeout(() => {
+          inner.style.transform = 'translateY(0)';
+        }, delay);
+      }
+      digit.appendChild(inner);
+      return digit;
     }
 
     async function fetchAndUpdate() {
