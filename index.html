@@ -18,7 +18,8 @@
     }
     table {
       border-collapse: collapse;
-      width: 700px;
+      width: 100%;
+      max-width: 800px;
       background: rgba(30, 0, 60, 0.85);
       border-radius: 15px;
       box-shadow: 0 0 40px #8a2be2;
@@ -28,13 +29,13 @@
       padding: 18px 24px;
       text-align: left;
       font-weight: 700;
-      font-size: 1.4rem;
-      border-bottom: 1px solid rgba(255,255,255,0.1);
+      font-size: 1.2rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     }
     th {
       background: #3a006f;
       letter-spacing: 2px;
-      font-size: 1.7rem;
+      font-size: 1.5rem;
       text-transform: uppercase;
       border-bottom: 2px solid #8a2be2;
     }
@@ -58,47 +59,16 @@
       margin-right: 12px;
       vertical-align: middle;
     }
-    .country-container {
-      display: flex;
-      align-items: center;
-    }
-    .subscribers {
-      font-weight: 900;
-      font-size: 1.5rem;
-      display: inline-flex;
-      gap: 0;
+    td span.name {
+      vertical-align: middle;
     }
     .digit {
-      position: relative;
-      width: 20px; /* Tamaño compacto */
-      height: 28px;
-      overflow: hidden;
-      display: inline-block;
-      margin: 0 1px; /* Espaciado reducido */
-      text-align: center;
-      line-height: 28px;
-      font-size: 1.6rem;
-      font-weight: bold;
-      font-family: 'Orbitron', monospace;
+      font-size: 1.4rem;
     }
-    .digit-inner {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      transform: translateY(0);
-      transition: transform 0.6s cubic-bezier(0.22, 0.61, 0.36, 1);
-    }
-    .digit-inner span {
-      display: block;
-      height: 28px;
-      line-height: 28px;
-      font-size: 1.6rem;
-    }
-    .spin-up span {
+    .digit.spin-up {
       color: #00ff88;
     }
-    .spin-down span {
+    .digit.spin-down {
       color: #ff0044;
     }
   </style>
@@ -107,7 +77,7 @@
   <table>
     <thead>
       <tr>
-        <th>PAÍS</th>
+        <th>PAIS</th>
         <th>POWER</th>
       </tr>
     </thead>
@@ -119,44 +89,11 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
     const SUPABASE_URL = 'https://pcnrwrttjbwannedamki.supabase.co';
-    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBjbnJ3cnR0amJ3YW5uZWRhbWtpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA4NTkwODUsImV4cCI6MjA2NjQzNTA4NX0.j62o4rP8afaRiaMyfX-UTze5B8ftgRgpwrGLq4FEvcs';
-
+    const SUPABASE_KEY = 'tu-api-key-aquí';
     const client = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
     const tbody = document.getElementById('tabla-equipos-body');
     const previousValues = new Map();
-
-    function createDigitElement(oldChar, newChar, direction, delay) {
-      const digit = document.createElement('span');
-      digit.className = 'digit';
-      const inner = document.createElement('div');
-      inner.className = 'digit-inner';
-
-      const oldSpan = document.createElement('span');
-      oldSpan.textContent = oldChar;
-      const newSpan = document.createElement('span');
-      newSpan.textContent = newChar;
-
-      if (direction === 'up') {
-        digit.classList.add('spin-up');
-        inner.appendChild(oldSpan);
-        inner.appendChild(newSpan);
-        inner.style.transform = 'translateY(0)';
-        setTimeout(() => {
-          inner.style.transform = 'translateY(-28px)';
-        }, delay);
-      } else if (direction === 'down') {
-        digit.classList.add('spin-down');
-        inner.appendChild(newSpan);
-        inner.appendChild(oldSpan);
-        inner.style.transform = 'translateY(-28px)';
-        setTimeout(() => {
-          inner.style.transform = 'translateY(0)';
-        }, delay);
-      }
-      digit.appendChild(inner);
-      return digit;
-    }
 
     async function fetchAndUpdate() {
       const { data: equipos, error } = await client
@@ -174,22 +111,23 @@
       equipos.forEach((equipo) => {
         const tr = document.createElement('tr');
 
-        tr.innerHTML = `
-          <td>
-            <div class="country-container">
-              <img src="${equipo.image_url}" alt="${equipo.name}" class="country-flag" />
-              <span>${equipo.name}</span>
-            </div>
-          </td>
-        `;
+        const imageSrc = equipo.image_url || 'https://via.placeholder.com/36.webp';
+        const tdPais = document.createElement('td');
+        tdPais.innerHTML = `<img src="${imageSrc}" alt="${equipo.name}" /> ${equipo.name}`;
 
         const tdValue = document.createElement('td');
         const oldValue = previousValues.get(equipo.id) ?? 0;
         const newValue = equipo.value;
 
-        tdValue.textContent = newValue;
-        tr.appendChild(tdValue);
+        const span = document.createElement('span');
+        span.className = 'digit';
+        span.textContent = newValue;
+        span.classList.add(newValue > oldValue ? 'spin-up' : 'spin-down');
 
+        tdValue.appendChild(span);
+
+        tr.appendChild(tdPais);
+        tr.appendChild(tdValue);
         tbody.appendChild(tr);
 
         previousValues.set(equipo.id, newValue);
