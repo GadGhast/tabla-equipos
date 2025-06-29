@@ -10,7 +10,7 @@ function formatNumberToDigits(num) {
   return num.toLocaleString('es-ES').split('');
 }
 
-function createDigitElement(oldChar, newChar, direction, delay) {
+function createDigitElement(oldChar, newChar, direction, delay, overallChange) {
   const digit = document.createElement('span');
   digit.className = 'digit';
   if (newChar === '.') digit.classList.add('decimal');
@@ -23,8 +23,14 @@ function createDigitElement(oldChar, newChar, direction, delay) {
   const newSpan = document.createElement('span');
   newSpan.textContent = newChar;
 
-  if (direction === 'up') {
+  // Aplicar color solo si cifra cambia, según cambio global
+  if (overallChange > 0) {
     digit.classList.add('spin-up');
+  } else if (overallChange < 0) {
+    digit.classList.add('spin-down');
+  }
+
+  if (direction === 'up') {
     inner.appendChild(oldSpan);
     inner.appendChild(newSpan);
     inner.style.transform = 'translateY(0)';
@@ -33,7 +39,6 @@ function createDigitElement(oldChar, newChar, direction, delay) {
       inner.style.transform = 'translateY(-28px)';
     }, 50);
   } else {
-    digit.classList.add('spin-down');
     inner.appendChild(newSpan);
     inner.appendChild(oldSpan);
     inner.style.transform = 'translateY(-28px)';
@@ -52,21 +57,27 @@ function animateNumber(oldNum, newNum) {
   const newChars = formatNumberToDigits(newNum);
   const digitsContainer = document.createDocumentFragment();
 
+  // Cambio global: 1 = sube, -1 = baja, 0 = igual
+  const overallChange = (newNum > oldNum) ? 1 : (newNum < oldNum) ? -1 : 0;
+
   for (let i = 0; i < newChars.length; i++) {
     const oldChar = oldChars[i] || ' ';
     const newChar = newChars[i];
 
     if (oldChar === newChar) {
+      // Cifra sin cambio, sin color ni animación
       const span = document.createElement('span');
       span.className = 'digit';
       if (newChar === '.') span.classList.add('decimal');
       span.textContent = newChar;
       digitsContainer.appendChild(span);
     } else {
+      // Cifra distinta, animar y colorear según cambio global
       const oldDigit = parseInt(oldChar) || 0;
       const newDigit = parseInt(newChar) || 0;
-      const direction = oldNum > newNum ? 'down' : 'up';
-      digitsContainer.appendChild(createDigitElement(oldChar, newChar, direction, i * 60));
+      const direction = newDigit > oldDigit ? 'up' : 'down';
+
+      digitsContainer.appendChild(createDigitElement(oldChar, newChar, direction, i * 60, overallChange));
     }
   }
   return digitsContainer;
@@ -89,15 +100,11 @@ async function fetchAndUpdate() {
     const tr = document.createElement('tr');
 
     tr.innerHTML = `
-      <td>
-        <div class="country-container">
-          <img src="${equipo.image_url}" alt="${equipo.name}" class="country-flag" />
-          <span>${equipo.name}</span>
-        </div>
-      </td>
+      <td>${equipo.name}</td>
     `;
 
     const tdValue = document.createElement('td');
+
     const oldValue = previousValues.get(equipo.id) ?? 0;
     const newValue = equipo.value;
 
