@@ -34,7 +34,7 @@
     thead th {
       background: #3a006f;
       letter-spacing: 2px;
-      font-size: 1.55rem; /* Tamaño ajustado */
+      font-size: 1.55rem;
       text-transform: uppercase;
       border-bottom: 2px solid #8a2be2;
     }
@@ -63,6 +63,8 @@
       border-radius: 50%;
       margin-right: 12px;
       vertical-align: middle;
+      object-fit: cover; /* Mantiene la proporción */
+      object-position: center; /* Centra la imagen */
     }
     td span.name {
       vertical-align: middle;
@@ -131,8 +133,9 @@
         tr.appendChild(tdValue);
         tbody.appendChild(tr);
 
-        // Efecto flash si cambia de posición
-        if (previousOrder.indexOf(equipo.id) !== index) {
+        // Efecto flash sólo en equipos que suben de posición
+        const previousIndex = previousOrder.indexOf(equipo.id);
+        if (previousIndex !== -1 && previousIndex > index) {
           tr.classList.add('flash');
           setTimeout(() => tr.classList.remove('flash'), 1000);
         }
