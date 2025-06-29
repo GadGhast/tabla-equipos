@@ -70,9 +70,6 @@
       margin-right: 12px;
       vertical-align: middle;
     }
-    td span.name {
-      vertical-align: middle;
-    }
     .subscribers {
       font-weight: 900;
       font-size: 1.5rem;
@@ -92,6 +89,12 @@
       font-weight: bold;
       font-family: 'Orbitron', monospace;
     }
+    .spin-up span {
+      color: #00ff88;
+    }
+    .spin-down span {
+      color: #ff0044;
+    }
     .flash {
       animation: flash 1s linear;
     }
@@ -110,7 +113,7 @@
       </tr>
     </thead>
     <tbody id="tabla-equipos-body">
-      <!-- filas se insertan aquí -->
+      <!-- filas dinámicas -->
     </tbody>
   </table>
 
@@ -122,6 +125,7 @@
 
     const tbody = document.getElementById('tabla-equipos-body');
     let previousOrder = [];
+    let previousValues = {};
 
     async function fetchAndUpdate() {
       const { data: equipos, error } = await client
@@ -137,9 +141,6 @@
       const newOrder = equipos.map(e => e.id);
 
       equipos.forEach((equipo, index) => {
-        const oldIndex = previousOrder.indexOf(equipo.id);
-
-        // Crear o actualizar filas
         let tr = document.querySelector(`#row-${equipo.id}`);
         if (!tr) {
           tr = document.createElement('tr');
@@ -149,19 +150,36 @@
               <img src="${equipo.image}" alt="${equipo.name}" />
               ${equipo.name}
             </td>
-            <td>${equipo.value}</td>
+            <td class="subscribers">
+              ${renderDigits(equipo.value, previousValues[equipo.id])}
+            </td>
           `;
           tbody.appendChild(tr);
+        } else {
+          const valueCell = tr.querySelector('.subscribers');
+          valueCell.innerHTML = renderDigits(equipo.value, previousValues[equipo.id]);
         }
 
-        // Detectar cambio de posición
+        // Efecto flash al subir de posición
+        const oldIndex = previousOrder.indexOf(equipo.id);
         if (oldIndex !== -1 && oldIndex > index) {
           tr.classList.add('flash');
           setTimeout(() => tr.classList.remove('flash'), 1000);
         }
+
+        previousValues[equipo.id] = equipo.value;
       });
 
       previousOrder = newOrder;
+    }
+
+    function renderDigits(newValue, oldValue) {
+      const digits = String(newValue).split('');
+      const oldDigits = String(oldValue || '').split('');
+      return digits.map((digit, i) => {
+        const changeClass = digit > (oldDigits[i] || 0) ? 'spin-up' : digit < (oldDigits[i] || 0) ? 'spin-down' : '';
+        return `<span class="digit ${changeClass}"><span>${digit}</span></span>`;
+      }).join('');
     }
 
     setInterval(fetchAndUpdate, 1000);
