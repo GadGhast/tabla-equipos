@@ -3,129 +3,122 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Tabla de Equipos Gaming</title>
+  <title>MUNDIAL FIGHTWARS</title>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet" />
   <style>
-  body {
-    font-family: 'Orbitron', sans-serif;
-    background: linear-gradient(135deg, #0b0c30 0%, #4b0082 100%);
-    color: #eee;
-    margin: 0;
-    padding: 50px 20px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
-  table {
-    border-collapse: collapse;
-    width: 700px;
-    background: rgba(30, 0, 60, 0.85);
-    border-radius: 15px;
-    box-shadow: 0 0 40px #8a2be2;
-    overflow: hidden;
-  }
-  th, td {
-    padding: 18px 24px;
-    text-align: left;
-    font-weight: 700;
-    font-size: 1.2rem; /* tamaño base para celdas */
-    border-bottom: 1px solid rgba(255,255,255,0.1);
-  }
-  /* Aumentar tamaño de letra 3px en encabezados de PAIS y POWER */
-  thead th:nth-child(1),
-  thead th:nth-child(2) {
-    font-size: 1.55rem; /* 1.2rem + 3px aprox */
-  }
-  thead th {
-    background: #3a006f;
-    letter-spacing: 2px;
-    font-size: 1.4rem;
-    text-transform: uppercase;
-    border-bottom: 2px solid #8a2be2;
-  }
-  /* Ajustar tamaño columna PAIS igual que POWER */
-  tbody td:nth-child(1),
-  thead th:nth-child(1) {
-    font-size: 1.6rem;
-  }
-  tbody td:nth-child(2),
-  thead th:nth-child(2) {
-    font-size: 1.55rem; /* Título PAIS también +3px */
-  }
-  /* Alternancia de filas */
-  tbody tr:nth-child(odd) {
-    background: rgba(75, 0, 130, 0.6);
-    transition: background 0.3s ease;
-  }
-  tbody tr:nth-child(even) {
-    background: rgba(11, 12, 48, 0.6);
-    transition: background 0.3s ease;
-  }
-  tbody tr:hover {
-    background: #8a2be2;
-    color: #fff;
-    cursor: pointer;
-  }
-  td img {
-    width: 36px;
-    height: 36px;
-    border-radius: 50%;
-    margin-right: 12px;
-    vertical-align: middle;
-  }
-  td span.name {
-    vertical-align: middle;
-  }
-  .subscribers {
-    font-weight: 900;
-    font-size: 1.5rem;
-    display: inline-flex;
-    gap: 0;
-  }
-  .digit {
-    position: relative;
-    width: 20px; /* Tamaño compacto */
-    height: 28px;
-    overflow: hidden;
-    display: inline-block;
-    margin: 0 1px; /* Espaciado reducido */
-    text-align: center;
-    line-height: 28px;
-    font-size: 1.6rem;
-    font-weight: bold;
-    font-family: 'Orbitron', monospace;
-  }
-  .digit.decimal {
-    width: 10px; /* Más pequeño para el punto */
-    margin: 0 0.5px; /* Ajustado */
-  }
-  .digit-inner {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    transform: translateY(0);
-    transition: transform 0.6s cubic-bezier(0.22, 0.61, 0.36, 1);
-  }
-  .digit-inner span {
-    display: block;
-    height: 28px;
-    line-height: 28px;
-    font-size: 1.6rem;
-  }
-  .spin-up span {
-    color: #00ff88;
-  }
-  .spin-down span {
-    color: #ff0044;
-  }
-</style>
+    body {
+      font-family: 'Orbitron', sans-serif;
+      background: linear-gradient(135deg, #0b0c30 0%, #4b0082 100%);
+      color: #eee;
+      margin: 0;
+      padding: 50px 20px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    table {
+      border-collapse: collapse;
+      width: 700px;
+      background: rgba(30, 0, 60, 0.85);
+      border-radius: 15px;
+      box-shadow: 0 0 40px #8a2be2;
+      overflow: hidden;
+    }
+    th, td {
+      padding: 18px 24px;
+      text-align: left;
+      font-weight: 700;
+      font-size: 1.4rem;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+    th {
+      background: #3a006f;
+      letter-spacing: 2px;
+      font-size: 1.7rem;
+      text-transform: uppercase;
+      border-bottom: 2px solid #8a2be2;
+    }
+    tbody tr:nth-child(odd) {
+      background: rgba(75, 0, 130, 0.6);
+      transition: background 0.3s ease;
+    }
+    tbody tr:nth-child(even) {
+      background: rgba(11, 12, 48, 0.6);
+      transition: background 0.3s ease;
+    }
+    tbody tr:hover {
+      background: #8a2be2;
+      color: #fff;
+      cursor: pointer;
+    }
+    td img {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      margin-right: 12px;
+      vertical-align: middle;
+    }
+    .country-container {
+      display: flex;
+      align-items: center;
+    }
+    .country-flag {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%; /* Hace las imágenes redondas */
+      object-fit: cover; /* Asegura que la imagen no se distorsione */
+      margin-right: 10px;
+    }
+    .subscribers {
+      font-weight: 900;
+      font-size: 1.5rem;
+      display: inline-flex;
+      gap: 0;
+    }
+    .digit {
+      position: relative;
+      width: 20px; /* Tamaño compacto */
+      height: 28px;
+      overflow: hidden;
+      display: inline-block;
+      margin: 0 1px; /* Espaciado reducido */
+      text-align: center;
+      line-height: 28px;
+      font-size: 1.6rem;
+      font-weight: bold;
+      font-family: 'Orbitron', monospace;
+    }
+    .digit.decimal {
+      width: 10px; /* Más pequeño para el punto */
+      margin: 0 0.5px; /* Ajustado */
+    }
+    .digit-inner {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      transform: translateY(0);
+      transition: transform 0.6s cubic-bezier(0.22, 0.61, 0.36, 1);
+    }
+    .digit-inner span {
+      display: block;
+      height: 28px;
+      line-height: 28px;
+      font-size: 1.6rem;
+    }
+    .spin-up span {
+      color: #00ff88;
+    }
+    .spin-down span {
+      color: #ff0044;
+    }
+  </style>
 </head>
 <body>
   <table>
     <thead>
       <tr>
-        <th>PAIS</th>
+        <th>PAÍS</th>
         <th>POWER</th>
       </tr>
     </thead>
@@ -135,6 +128,59 @@
   </table>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="main.js"></script>
+  <script>
+    const SUPABASE_URL = 'https://pcnrwrttjbwannedamki.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBjbnJ3cnR0amJ3YW5uZWRhbWtpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA4NTkwODUsImV4cCI6MjA2NjQzNTA4NX0.j62o4rP8afaRiaMyfX-UTze5B8ftgRgpwrGLq4FEvcs';
+
+    const client = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    const tbody = document.getElementById('tabla-equipos-body');
+    const previousValues = new Map();
+
+    function formatNumberToDigits(num) {
+      return num.toLocaleString('es-ES').split('');
+    }
+
+    async function fetchAndUpdate() {
+      const { data: equipos, error } = await client
+        .from('equipos')
+        .select('*')
+        .order('value', { ascending: false });
+
+      if (error) {
+        console.error('Error al obtener datos:', error);
+        return;
+      }
+
+      tbody.innerHTML = '';
+
+      equipos.forEach((equipo) => {
+        const tr = document.createElement('tr');
+
+        tr.innerHTML = `
+          <td>
+            <div class="country-container">
+              <img src="${equipo.image_url}" alt="${equipo.name}" class="country-flag" />
+              <span>${equipo.name}</span>
+            </div>
+          </td>
+        `;
+
+        const tdValue = document.createElement('td');
+        const oldValue = previousValues.get(equipo.id) ?? 0;
+        const newValue = equipo.value;
+
+        tdValue.textContent = newValue;
+        tr.appendChild(tdValue);
+
+        tbody.appendChild(tr);
+
+        previousValues.set(equipo.id, newValue);
+      });
+    }
+
+    setInterval(fetchAndUpdate, 1000);
+    fetchAndUpdate();
+  </script>
 </body>
 </html>
