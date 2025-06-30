@@ -1,13 +1,12 @@
 const SUPABASE_URL = 'https://pcnrwrttjbwannedamki.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBjbnJ3cnR0amJ3YW5uZWRhbWtpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA4NTkwODUsImV4cCI6MjA2NjQzNTA4NX0.j62o4rP8afaRiaMyfX-UTze5B8ftgRgpwrGLq4FEvcs';
 
-const DISCORD_WEBHOOK_URL = 'https://discord.com/api/webhooks/1389365080285773845/j_6tsQa90hfHvZ5QE3yuBDHErjm5UGvPlKUcz-ScotwW3kwNpm48PffWgQqLH7Ixp8jf';
-
 const client = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 const tbody = document.getElementById('tabla-equipos-body');
 const previousValues = new Map();
 const previousPositions = new Map();
+
 
 function formatNumberToDigits(num) {
   return num.toLocaleString('es-ES').split('');
@@ -77,28 +76,6 @@ function animateNumber(oldNum, newNum) {
 
 const flashTimeouts = new Map();
 
-async function enviarWebhookDiscord(equipos) {
-  const contenido = equipos
-    .map((equipo, i) => `**${i + 1}. ${equipo.name}**: ${equipo.value}`)
-    .join('\n');
-
-  const payload = {
-    content: `📊 **Actualización de Equipos - Valores Actuales:**\n${contenido}`,
-  };
-
-  try {
-    await fetch(DISCORD_WEBHOOK_URL, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(payload),
-    });
-  } catch (error) {
-    console.error('Error enviando webhook a Discord:', error);
-  }
-}
-
 async function fetchAndUpdate() {
   const { data: equipos, error } = await client
     .from('equipos')
@@ -133,6 +110,7 @@ async function fetchAndUpdate() {
 
     const oldPosition = previousPositions.get(equipo.id);
     if (oldPosition !== undefined && oldPosition > index) {
+      // Evitar múltiples flashes simultáneos en Android
       if (!flashTimeouts.has(equipo.id)) {
         tr.classList.add('flash');
         const timeoutId = setTimeout(() => {
@@ -148,9 +126,6 @@ async function fetchAndUpdate() {
     previousValues.set(equipo.id, newValue);
     previousPositions.set(equipo.id, index);
   });
-
-  // Enviar datos actualizados a Discord vía webhook:
-  await enviarWebhookDiscord(equipos);
 }
 
 setInterval(fetchAndUpdate, 1000);
