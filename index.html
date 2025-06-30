@@ -6,159 +6,182 @@
   <title>Mundial FightWars</title>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet" />
   <style>
-  body {
-    font-family: 'Orbitron', sans-serif;
-    background: linear-gradient(135deg, #0b0c30 0%, #4b0082 100%);
-    color: #eee;
-    margin: 0;
-    padding: 50px 20px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
-  table {
-    border-collapse: collapse;
-    width: 700px;
-    background: rgba(30, 0, 60, 0.85);
-    border-radius: 15px;
-    box-shadow: 0 0 40px #8a2be2;
-    overflow: hidden;
-  }
-  th, td {
-    padding: 18px 24px;
-    text-align: left;
-    font-weight: 700;
-    font-size: 1.2rem; /* tamaño base para celdas */
-    border-bottom: 1px solid rgba(255,255,255,0.1);
-  }
-  /* Aumentar tamaño de letra 3px en encabezados de PAIS y POWER */
-  thead th:nth-child(1),
-  thead th:nth-child(2) {
-    font-size: 1.55rem; /* 1.2rem + 3px aprox */
-  }
-  thead th {
-    background: #3a006f;
-    letter-spacing: 2px;
-    font-size: 1.4rem;
-    text-transform: uppercase;
-    border-bottom: 2px solid #8a2be2;
-  }
-  /* Ajustar tamaño columna PAIS igual que POWER */
-  tbody td:nth-child(1),
-  thead th:nth-child(1) {
-    font-size: 1.6rem;
-  }
-  tbody td:nth-child(2),
-  thead th:nth-child(2) {
-    font-size: 1.55rem; /* Título PAIS también +3px */
-  }
-  /* Alternancia de filas */
-  tbody tr:nth-child(odd) {
-    background: rgba(75, 0, 130, 0.6);
-    transition: background 0.3s ease;
-  }
-  tbody tr:nth-child(even) {
-    background: rgba(11, 12, 48, 0.6);
-    transition: background 0.3s ease;
-  }
-  tbody tr:hover {
-    background: #8a2be2;
-    color: #fff;
-    cursor: pointer;
-  }
-  td img {
-    width: 36px;
-    height: 36px;
-    border-radius: 50%;
-    margin-right: 12px;
-    vertical-align: middle;
-  }
-  td span.name {
-    vertical-align: middle;
-  }
-  .subscribers {
-    font-weight: 900;
-    font-size: 1.5rem;
-    display: inline-flex;
-    gap: 0;
-  }
-  .digit {
-    position: relative;
-    width: 20px; /* Tamaño compacto */
-    height: 28px;
-    overflow: hidden;
-    display: inline-block;
-    margin: 0 1px; /* Espaciado reducido. */
-    text-align: center;
-    line-height: 28px;
-    font-size: 1.6rem;
-    font-weight: bold;
-    font-family: 'Orbitron', monospace;
-  }
-  .digit.decimal {
-    width: 10px; /* Más pequeño para el punto */
-    margin: 0 0.5px; /* Ajustado */
-  }
-  .digit-inner {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    transform: translateY(0);
-    transition: transform 0.6s cubic-bezier(0.22, 0.61, 0.36, 1);
-  }
-  .digit-inner span {
-    display: block;
-    height: 28px;
-    line-height: 28px;
-    font-size: 1.6rem;
-  }
-  .country-container {
-    display: flex;
-	align-items: center;
-  }
-  .country-flag {
-	width: 36px;
-	height: 36px;
-	border-radius: 50%; /* Hace las imágenes redondas */
-	object-fit: cover; /* Asegura que la imagen no se distorsione */
-	margin-right: 10px; /* Espaciado entre imagen y texto */
-  }
-  .country-container span {
-	font-size: 1.2rem; /* Ajusta el tamaño del texto si es necesario */
-	font-weight: bold;
-	color: #eee;
-  }
-  .spin-up span {
-    color: #00ff88;
-  }
-  .spin-down span {
-    color: #ff0044;
-  }
-  .flash {
-    animation: flash-effect 1s ease-out;
-  }
-
-  @keyframes flash-effect {
-	0% {
-		background-color: #8a2be2;
-	}
-	50% {
-		background-color: #8a2be2;
+    body {
+      font-family: 'Orbitron', sans-serif;
+      background: linear-gradient(135deg, #0b0c30 0%, #4b0082 100%);
+      color: #eee;
+      margin: 0;
+      padding: 50px 20px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
     }
-	100% {
-		background-color: #8a2be2;
-	}
-  }
 
-</style>
+    table {
+      border-collapse: collapse;
+      width: 700px;
+      max-width: 90%;
+      background: rgba(30, 0, 60, 0.85);
+      border-radius: 15px;
+      box-shadow: 0 0 40px #8a2be2;
+      overflow: hidden;
+    }
+
+    th, td {
+      padding: 18px 24px;
+      text-align: left;
+      font-weight: 700;
+      font-size: 1.2rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    thead th:nth-child(1),
+    thead th:nth-child(2) {
+      font-size: 1.55rem;
+    }
+
+    thead th {
+      background: #3a006f;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      border-bottom: 2px solid #8a2be2;
+    }
+
+    tbody td:nth-child(1),
+    thead th:nth-child(1) {
+      font-size: 1.6rem;
+    }
+
+    tbody td:nth-child(2),
+    thead th:nth-child(2) {
+      font-size: 1.55rem;
+    }
+
+    tbody tr:nth-child(odd) {
+      background: rgba(75, 0, 130, 0.6);
+      transition: background 0.3s ease;
+    }
+
+    tbody tr:nth-child(even) {
+      background: rgba(11, 12, 48, 0.6);
+      transition: background 0.3s ease;
+    }
+
+    tbody tr:hover {
+      background: #8a2be2;
+      color: #fff;
+      cursor: pointer;
+    }
+
+    td img {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      margin-right: 12px;
+      vertical-align: middle;
+    }
+
+    td span.name {
+      vertical-align: middle;
+    }
+
+    .subscribers {
+      font-weight: 900;
+      font-size: 1.5rem;
+      display: inline-flex;
+      gap: 2px;
+    }
+
+    td {
+      min-width: 120px; /* Asegura un espacio mínimo para celdas de números */
+      white-space: nowrap; /* Evita que el contenido se divida en varias líneas */
+      overflow: hidden; /* Recorta el contenido si es necesario */
+      text-overflow: ellipsis; /* Añade "..." si el contenido es demasiado largo */
+    }
+
+    .digit {
+      position: relative;
+      width: 28px;
+      height: 36px;
+      overflow: hidden;
+      display: inline-block;
+      margin: 0 2px;
+      text-align: center;
+      line-height: 36px;
+      font-size: 1.8rem;
+      font-weight: bold;
+      font-family: 'Orbitron', monospace;
+    }
+
+    .digit.decimal {
+      width: 16px;
+    }
+
+    .digit-inner {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      transform: translateY(0);
+      transition: transform 0.6s cubic-bezier(0.22, 0.61, 0.36, 1);
+    }
+
+    .digit-inner span {
+      display: block;
+      height: 36px;
+      line-height: 36px;
+    }
+
+    .country-container {
+      display: flex;
+      align-items: center;
+    }
+
+    .country-flag {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      object-fit: cover;
+      margin-right: 10px;
+    }
+
+    .country-container span {
+      font-size: 1.2rem;
+      font-weight: bold;
+      color: #eee;
+    }
+
+    .spin-up span {
+      color: #00ff88;
+    }
+
+    .spin-down span {
+      color: #ff0044;
+    }
+
+    .flash {
+      animation: flash-effect 1s ease-out;
+    }
+
+    @keyframes flash-effect {
+      0% {
+        background-color: #8a2be2;
+      }
+      50% {
+        background-color: #8a2be2;
+      }
+      100% {
+        background-color: #8a2be2;
+      }
+    }
+  </style>
 </head>
 <body>
   <table>
     <thead>
       <tr>
-        <th></th>
-        <th></th>
+        <th>País</th>
+        <th>Poder</th>
       </tr>
     </thead>
     <tbody id="tabla-equipos-body">
