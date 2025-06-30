@@ -1,5 +1,6 @@
 const SUPABASE_URL = 'https://pcnrwrttjbwannedamki.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBjbnJ3cnR0amJ3YW5uZWRhbWtpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA4NTkwODUsImV4cCI6MjA2NjQzNTA4NX0.j62o4rP8afaRiaMyfX-UTze5B8ftgRgpwrGLq4FEvcs';
+
 const DISCORD_WEBHOOK_URL = 'https://discord.com/api/webhooks/1389365080285773845/j_6tsQa90hfHvZ5QE3yuBDHErjm5UGvPlKUcz-ScotwW3kwNpm48PffWgQqLH7Ixp8jf';
 
 const client = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
@@ -76,27 +77,25 @@ function animateNumber(oldNum, newNum) {
 
 const flashTimeouts = new Map();
 
-async function sendUpdateToDiscord(equipos) {
-  const embeds = equipos.map((equipo, index) => ({
-    title: `${index + 1}. ${equipo.name}`,
-    description: `Valor: ${equipo.value}`,
-    thumbnail: { url: equipo.image_url },
-    color: index === 0 ? 3066993 : 0, // Verde para el primer lugar
-  }));
+async function enviarWebhookDiscord(equipos) {
+  const contenido = equipos
+    .map((equipo, i) => `**${i + 1}. ${equipo.name}**: ${equipo.value}`)
+    .join('\n');
 
   const payload = {
-    username: "Tabla de Equipos",
-    embeds: embeds,
+    content: `📊 **Actualización de Equipos - Valores Actuales:**\n${contenido}`,
   };
 
   try {
     await fetch(DISCORD_WEBHOOK_URL, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+      },
       body: JSON.stringify(payload),
     });
   } catch (error) {
-    console.error('Error al enviar al webhook de Discord:', error);
+    console.error('Error enviando webhook a Discord:', error);
   }
 }
 
@@ -150,7 +149,8 @@ async function fetchAndUpdate() {
     previousPositions.set(equipo.id, index);
   });
 
-  sendUpdateToDiscord(equipos);
+  // Enviar datos actualizados a Discord vía webhook:
+  await enviarWebhookDiscord(equipos);
 }
 
 setInterval(fetchAndUpdate, 1000);
