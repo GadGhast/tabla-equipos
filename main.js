@@ -4,24 +4,24 @@ const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZ
 const client = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 /* ---------- DOM ---------- */
-const tbody = document.getElementById('tabla-equipos-body');
-const objetivosBody = document.getElementById('tabla-objetivos-body');
+const tbody           = document.getElementById('tabla-equipos-body');
+const objetivosBody   = document.getElementById('tabla-objetivos-body');
 
-/* ---------- Anteriores ---------- */
+/* ---------- Mapas de estado ---------- */
 const previousValues    = new Map();
 const previousPositions = new Map();
 const flashTimeouts     = new Map();
 
-/* ---------- Objetivos hasta 1 000 000 ---------- */
-const metas = Array.from({ length: 100 }, (_, i) => (i + 1) * 10000); // 10 000 → 1 000 000
-const objetivosAlcanzados = new Map(); // meta → equipoId
+/* ---------- Objetivos: 10 000 → 1 000 000 ---------- */
+const metas = Array.from({ length: 100 }, (_, i) => (i + 1) * 10000); // [10000, 20000, ... 1000000]
 
 /* ---------- Helpers de dígitos ---------- */
-function formatNumberToDigits(n){return n.toLocaleString('es-ES').split('');}
+function formatNumberToDigits(n){ return n.toLocaleString('es-ES').split(''); }
+
 function createDigitElement(oldChar,newChar,direction,delay){
   const digit=document.createElement('span');
   digit.className='digit';
-  if(newChar === '.') digit.classList.add('decimal');
+  if(newChar==='.') digit.classList.add('decimal');
 
   const inner=document.createElement('div');inner.className='digit-inner';
   const oldSpan=document.createElement('span');oldSpan.textContent=oldChar;
@@ -41,10 +41,12 @@ function createDigitElement(oldChar,newChar,direction,delay){
   digit.appendChild(inner);
   return digit;
 }
+
 function animateNumber(oldNum,newNum){
   const oldChars=oldNum!==undefined?formatNumberToDigits(oldNum):[];
   const newChars=formatNumberToDigits(newNum);
   const frag=document.createDocumentFragment();
+
   for(let i=0;i<newChars.length;i++){
     const oldChar=oldChars[i]||' ';
     const newChar=newChars[i];
@@ -60,28 +62,82 @@ function animateNumber(oldNum,newNum){
   return frag;
 }
 
-/* ---------- Main update loop ---------- */
-async function fetchAndUpdate(){
-  const { data:equipos, error } = await client.from('equipos').select('*').order('value',{ascending:false});
-  if(error){ console.error('Error:',error); return; }
+/* ---------- Sincronizar hitos con Supabase ---------- */
+async function syncHitos(equipos){
+  /* 1. Obtener hitos ya guardados */
+  const { data:hitosExistentes, error } = await client
+      .from('hitos_logrados')
+      .select('puntuacion_alcanzada')
+      .order('puntuacion_alcanzada');
+  if(error){ console.error('Supabase hitos error:',error); return; }
 
-  /* ---- Tabla principal ---- */
-  tbody.innerHTML='';
-  equipos.forEach((eq,idx)=>{
+  const metasGuardadas = new Set(hitosExistentes.map(h => h.puntuacion_alcanzada));
+
+  /* 2. Insertar si se alcanza una meta nueva */
+  for(const meta of metas){
+    if(metasGuardadas.has(meta)) continue;
+
+    const pionero = equipos.find(e => e.value >= meta);
+    if(pionero){
+      await client.from('hitos_logrados').insert({
+        equipo_id: pionero.id,
+        equipo_name: pionero.name,
+        equipo_image_url: pionero.image_url,
+        puntuacion_alcanzada: meta
+      });
+      metasGuardadas.add(meta); // evitar doble inserción en este ciclo
+    }
+  }
+}
+
+/* ---------- Pintar tabla de hitos ---------- */
+async function renderHitos(){
+  const { data:hitos, error } = await client
+      .from('hitos_logrados')
+      .select('*')
+      .order('puntuacion_alcanzada');
+  if(error){ console.error('Supabase hitos error:',error); return; }
+
+  objetivosBody.innerHTML='';
+  hitos.forEach(h=>{
     const tr=document.createElement('tr');
     tr.innerHTML=`
       <td>
         <div class="country-container">
-          <img src="${eq.image_url}" alt="${eq.name}" class="country-flag">
-          <span>${eq.name}</span>
+          <img src="${h.equipo_image_url}" alt="${h.equipo_name}" class="country-flag">
+          <span>${h.equipo_name}</span>
         </div>
-      </td>`;
+      </td>
+      <td>${h.puntuacion_alcanzada.toLocaleString('es-ES')}</td>`;
+    objetivosBody.appendChild(tr);
+  });
+}
+
+/* ---------- Bucle principal ---------- */
+async function fetchAndUpdate(){
+  const { data:equipos, error } = await client
+      .from('equipos')
+      .select('*')
+      .order('value',{ ascending:false });
+  if(error){ console.error('Supabase equipos error:',error); return; }
+
+  /* -------- Tabla principal -------- */
+  tbody.innerHTML='';
+  equipos.forEach((eq,idx)=>{
+    const tr=document.createElement('tr');
+    tr.innerHTML = `
+      <td><div class="country-container">
+        <img src="${eq.image_url}" alt="${eq.name}" class="country-flag">
+        <span>${eq.name}</span>
+      </div></td>`;
+
+    /* Valor animado */
     const tdVal=document.createElement('td');
     const oldVal=previousValues.get(eq.id)??0;
     tdVal.appendChild(animateNumber(oldVal,eq.value));
     tr.appendChild(tdVal);
 
-    /* efecto flash si sube posición */
+    /* Flash si sube posición */
     const prevPos=previousPositions.get(eq.id);
     if(prevPos!==undefined && prevPos>idx && !flashTimeouts.has(eq.id)){
       tr.classList.add('flash');
@@ -90,31 +146,15 @@ async function fetchAndUpdate(){
     }
 
     tbody.appendChild(tr);
-    previousValues.set(eq.id,eq.value);
-    previousPositions.set(eq.id,idx);
+    previousValues.set(eq.id, eq.value);
+    previousPositions.set(eq.id, idx);
   });
 
-  /* ---- Tabla de hitos ---- */
-  metas.forEach(meta=>{
-    if(!objetivosAlcanzados.has(meta)){
-      const primero = equipos.find(e => e.value >= meta);
-      if(primero){
-        objetivosAlcanzados.set(meta, primero.id);
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td>
-            <div class="country-container">
-              <img src="${primero.image_url}" alt="${primero.name}" class="country-flag" />
-              <span>${primero.name}</span>
-            </div>
-          </td>
-          <td>${meta.toLocaleString('es-ES')}</td>
-        `;
-        objetivosBody.appendChild(tr);
-      }
-    }
-  });
+  /* -------- Hitos -------- */
+  await syncHitos(equipos); // Inserta nuevos hitos en Supabase si aparecen
+  await renderHitos();      // Muestra la tabla de hitos actualizada
 }
 
+/* ---------- Lanzar bucle -------- */
 fetchAndUpdate();
-setInterval(fetchAndUpdate,1000);
+setInterval(fetchAndUpdate, 1000);
