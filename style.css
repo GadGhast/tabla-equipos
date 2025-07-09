@@ -1,0 +1,135 @@
+body {
+    font-family: 'Roboto', sans-serif;
+    background-color: #1a1a2e;
+    color: #e0e0e0;
+    margin: 0;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+.container {
+    width: 100%;
+    max-width: 800px;
+}
+
+h1, h2 {
+    text-align: center;
+    color: #f7b733;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+section {
+    background-color: #162447;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 25px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+}
+
+/* --- Tabla de Clasificación --- */
+#tabla-clasificacion {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+#tabla-clasificacion th, #tabla-clasificacion td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid #1f4068;
+}
+
+#tabla-clasificacion th {
+    background-color: #1f4068;
+    color: #f7b733;
+}
+
+#tabla-clasificacion tr:last-child td {
+    border-bottom: none;
+}
+
+#tabla-clasificacion .team-cell {
+    display: flex;
+    align-items: center;
+}
+
+.flag {
+    width: 30px;
+    height: 20px;
+    margin-right: 10px;
+    border: 1px solid #e0e0e0;
+}
+
+/* --- Partido en Directo --- */
+#partido-directo-container {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    font-size: 24px;
+    font-weight: bold;
+    padding: 20px 0;
+}
+
+.equipo-info {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.marcador {
+    font-size: 36px;
+    color: #4caf50;
+    animation: number-flicker 1.5s infinite;
+}
+
+@keyframes number-flicker {
+    0%, 100% { opacity: 1; text-shadow: 0 0 8px #4caf50; }
+    50% { opacity: 0.8; text-shadow: 0 0 12px #4caf50; }
+}
+
+#temporizador-container {
+    text-align: center;
+    margin-top: 15px;
+}
+
+#temporizador {
+    font-size: 42px;
+    font-weight: 700;
+    color: #e94560;
+    background-color: #101010;
+    padding: 5px 20px;
+    border-radius: 5px;
+    letter-spacing: 2px;
+}
+
+/* --- Listas de Partidos (Próximos e Historial) --- */
+#lista-proximos-partidos, #lista-historial {
+    list-style: none;
+    padding: 0;
+}
+
+#lista-proximos-partidos li, #lista-historial li {
+    background-color: #121f3a;
+    padding: 15px;
+    margin-bottom: 8px;
+    border-radius: 5px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    font-size: 16px;
+}
+
+.list-flag {
+    width: 24px;
+    height: 16px;
+}
+
+.list-score {
+    font-weight: bold;
+    color: #f7b733;
+    margin: 0 10px;
+}
