@@ -125,8 +125,9 @@ async function tick() {
         segundos_restantes: nuevosSegundos
       }).eq('id', TEMP_ID);
 
-      const deltaLocal = Math.floor(Math.random() * 6) - 2;
-      const deltaVisitante = Math.floor(Math.random() * 6) - 2;
+      const deltaLocal = Math.floor(Math.random() * 8) - 5;        // [-5, +2]
+      const deltaVisitante = Math.floor(Math.random() * 8) - 5;    // [-5, +2]
+
       const nuevoLocal = marcador.marcador_local + deltaLocal;
       const nuevoVisitante = marcador.marcador_visitante + deltaVisitante;
 
