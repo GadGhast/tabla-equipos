@@ -1,13 +1,13 @@
-const express = require('express');
-const app = express();
-const port = process.env.PORT || 3000;
-
+import express from 'express';
 import { createClient } from '@supabase/supabase-js';
 
-const SUPABASE_URL = 'https://pcnrwrttjbwannedamki.supabase.co'; // pon tu URL Supabase aquí
-const SUPABASE_SERVICE_ROLE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBjbnJ3cnR0amJ3YW5uZWRhbWtpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA4NTkwODUsImV4cCI6MjA2NjQzNTA4NX0.j62o4rP8afaRiaMyfX-UTze5B8ftgRgpwrGLq4FEvcs'; // pon tu Service Role Key aquí
+const SUPABASE_URL = 'https://pcnrwrttjbwannedamki.supabase.co';
+const SUPABASE_SERVICE_ROLE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBjbnJ3cnR0amJ3YW5uZWRhbWtpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA4NTkwODUsImV4cCI6MjA2NjQzNTA4NX0.j62o4rP8afaRiaMyfX-UTze5B8ftgRgpwrGLq4FEvcs';
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
+
+const app = express();
+const PORT = process.env.PORT || 3000;
 
 const TEMP_ID = 1; // id fijo para temporizador
 const MARCADOR_ID = 1; // id fijo para marcador
