@@ -1,3 +1,7 @@
+const express = require('express');
+const app = express();
+const port = process.env.PORT || 3000;
+
 import { createClient } from '@supabase/supabase-js';
 
 const SUPABASE_URL = 'https://pcnrwrttjbwannedamki.supabase.co'; // pon tu URL Supabase aquí
