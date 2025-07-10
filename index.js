@@ -1,6 +1,8 @@
 import express from 'express';
 import path from 'path';
-import { createClient } from '@supabase/supabase-js';
+import {
+    createClient
+} from '@supabase/supabase-js';
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -15,222 +17,309 @@ const TIEMPO_PARTIDO = 1800;
 
 // --- Servir archivos estáticos ---
 app.get('/index.html', (req, res) => {
-  res.sendFile(path.join(process.cwd(), 'index.html'));
+    res.sendFile(path.join(process.cwd(), 'index.html'));
 });
 app.get('/main.js', (req, res) => {
-  res.sendFile(path.join(process.cwd(), 'main.js'));
+    res.sendFile(path.join(process.cwd(), 'main.js'));
 });
 app.get('/', (req, res) => {
-  res.sendFile(path.join(process.cwd(), 'index.html'));
+    res.sendFile(path.join(process.cwd(), 'index.html'));
 });
 
 // --- Inicializa datos al iniciar ---
 async function inicializarDatos() {
-  const { data: partidos } = await supabase.from('proximos_partidos').select('*');
-  if (!partidos || partidos.length < 1) {
-    await generarPartidosAleatorios();
-  }
+    const {
+        data: partidos
+    } = await supabase.from('proximos_partidos').select('*');
+    if (!partidos || partidos.length < 1) {
+        await generarPartidosAleatorios();
+    }
 
-  const { data: marcador, error: errMarcador } = await supabase.from('marcador').select('*').eq('id', MARCADOR_ID).single();
-  if (errMarcador || !marcador) {
-    const { data: primer } = await supabase.from('proximos_partidos').select('*').order('id').limit(1);
-    if (!primer || primer.length === 0) return;
-    await supabase.from('marcador').insert({
-      id: MARCADOR_ID,
-      equipo_local: primer[0].equipo1_id,
-      equipo_visitante: primer[0].equipo2_id,
-      marcador_local: 0,
-      marcador_visitante: 0
-    });
-    await supabase.from('proximos_partidos').delete().eq('id', primer[0].id);
-  }
+    const {
+        data: marcador,
+        error: errMarcador
+    } = await supabase.from('marcador').select('*').eq('id', MARCADOR_ID).single();
+    if (errMarcador || !marcador) {
+        const {
+            data: primer
+        } = await supabase.from('proximos_partidos').select('*').order('id').limit(1);
+        if (!primer || primer.length === 0) return;
+        await supabase.from('marcador').insert({
+            id: MARCADOR_ID,
+            equipo_local: primer[0].equipo1_id,
+            equipo_visitante: primer[0].equipo2_id,
+            marcador_local: 0,
+            marcador_visitante: 0
+        });
+        await supabase.from('proximos_partidos').delete().eq('id', primer[0].id);
+    }
 
-  const { data: temp, error: errTemp } = await supabase.from('temporizador').select('*').eq('id', TEMP_ID).single();
-  if (errTemp || !temp) {
-    await supabase.from('temporizador').insert({
-      id: TEMP_ID,
-      partido_actual: MARCADOR_ID,
-      segundos_restantes: TIEMPO_PARTIDO
-    });
-  }
+    const {
+        data: temp,
+        error: errTemp
+    } = await supabase.from('temporizador').select('*').eq('id', TEMP_ID).single();
+    if (errTemp || !temp) {
+        await supabase.from('temporizador').insert({
+            id: TEMP_ID,
+            partido_actual: MARCADOR_ID,
+            segundos_restantes: TIEMPO_PARTIDO
+        });
+    }
 }
 
 // --- Genera 10 partidos aleatorios únicos ---
 async function generarPartidosAleatorios() {
-  const { data: equipos } = await supabase.from('equipos').select('id');
-  const ids = equipos.map(e => e.id);
-  const partidos = [];
-  const usados = new Set();
+    const {
+        data: equipos
+    } = await supabase.from('equipos').select('id');
+    const ids = equipos.map(e => e.id);
+    const partidos = [];
+    const usados = new Set();
 
-  while (partidos.length < 10 && usados.size < ids.length * ids.length) {
-    const e1 = ids[Math.floor(Math.random() * ids.length)];
-    let e2 = ids[Math.floor(Math.random() * ids.length)];
-    while (e1 === e2) e2 = ids[Math.floor(Math.random() * ids.length)];
-    const key = [e1, e2].sort().join('-');
-    if (!usados.has(key)) {
-      partidos.push({ equipo1_id: e1, equipo2_id: e2 });
-      usados.add(key);
+    while (partidos.length < 10 && usados.size < ids.length * ids.length) {
+        const e1 = ids[Math.floor(Math.random() * ids.length)];
+        let e2 = ids[Math.floor(Math.random() * ids.length)];
+        while (e1 === e2) e2 = ids[Math.floor(Math.random() * ids.length)];
+        const key = [e1, e2].sort().join('-');
+        if (!usados.has(key)) {
+            partidos.push({
+                equipo1_id: e1,
+                equipo2_id: e2
+            });
+            usados.add(key);
+        }
     }
-  }
 
-  if (partidos.length > 0) {
-    await supabase.from('proximos_partidos').insert(partidos);
-    console.log(`Se generaron ${partidos.length} partidos nuevos.`);
-  }
+    if (partidos.length > 0) {
+        await supabase.from('proximos_partidos').insert(partidos);
+        console.log(`Se generaron ${partidos.length} partidos nuevos.`);
+    }
 }
 
 // --- Actualiza clasificación según el resultado ---
 async function actualizarClasificacion(marcador) {
-  const { data: el } = await supabase.from('equipos').select('*').eq('id', marcador.equipo_local).single();
-  const { data: ev } = await supabase.from('equipos').select('*').eq('id', marcador.equipo_visitante).single();
+    const {
+        data: el
+    } = await supabase.from('equipos').select('*').eq('id', marcador.equipo_local).single();
+    const {
+        data: ev
+    } = await supabase.from('equipos').select('*').eq('id', marcador.equipo_visitante).single();
 
-  if (marcador.marcador_local > marcador.marcador_visitante) {
-    await supabase.from('equipos').update({
-      puntos: el.puntos + 3,
-      victorias: el.victorias + 1
-    }).eq('id', el.id);
-    await supabase.from('equipos').update({
-      derrotas: ev.derrotas + 1
-    }).eq('id', ev.id);
-  } else if (marcador.marcador_local < marcador.marcador_visitante) {
-    await supabase.from('equipos').update({
-      puntos: ev.puntos + 3,
-      victorias: ev.victorias + 1
-    }).eq('id', ev.id);
-    await supabase.from('equipos').update({
-      derrotas: el.derrotas + 1
-    }).eq('id', el.id);
-  } else {
-    await supabase.from('equipos').update({
-      puntos: el.puntos + 1,
-      empates: el.empates + 1
-    }).eq('id', el.id);
-    await supabase.from('equipos').update({
-      puntos: ev.puntos + 1,
-      empates: ev.empates + 1
-    }).eq('id', ev.id);
-  }
+    if (marcador.marcador_local > marcador.marcador_visitante) {
+        await supabase.from('equipos').update({
+            puntos: el.puntos + 3,
+            victorias: el.victorias + 1
+        }).eq('id', el.id);
+        await supabase.from('equipos').update({
+            derrotas: ev.derrotas + 1
+        }).eq('id', ev.id);
+    } else if (marcador.marcador_local < marcador.marcador_visitante) {
+        await supabase.from('equipos').update({
+            puntos: ev.puntos + 3,
+            victorias: ev.victorias + 1
+        }).eq('id', ev.id);
+        await supabase.from('equipos').update({
+            derrotas: el.derrotas + 1
+        }).eq('id', el.id);
+    } else {
+        await supabase.from('equipos').update({
+            puntos: el.puntos + 1,
+            empates: el.empates + 1
+        }).eq('id', el.id);
+        await supabase.from('equipos').update({
+            puntos: ev.puntos + 1,
+            empates: ev.empates + 1
+        }).eq('id', ev.id);
+    }
 }
 
 // --- TICK de 1 segundo: decrementa temporizador y controla fin partido ---
 async function tick() {
-  try {
-    const { data: temp } = await supabase.from('temporizador').select('*').eq('id', TEMP_ID).single();
-    const { data: marcador } = await supabase.from('marcador').select('*').eq('id', MARCADOR_ID).single();
+    try {
+        const {
+            data: temp
+        } = await supabase.from('temporizador').select('*').eq('id', TEMP_ID).single();
+        const {
+            data: marcador
+        } = await supabase.from('marcador').select('*').eq('id', MARCADOR_ID).single();
 
-    if (temp.segundos_restantes > 0) {
-      const nuevosSegundos = temp.segundos_restantes - 1;
-      await supabase.from('temporizador').update({
-        segundos_restantes: nuevosSegundos
-      }).eq('id', TEMP_ID);
-      console.log(`Tick: ${nuevosSegundos}s restantes`);
-    } else {
-      // Fin partido: guardar resultado y actualizar clasificación
-      await supabase.from('resultados').insert({
-        equipo1_id: marcador.equipo_local,
-        equipo2_id: marcador.equipo_visitante,
-        marcador1: marcador.marcador_local,
-        marcador2: marcador.marcador_visitante
-      });
+        if (temp.segundos_restantes > 0) {
+            const nuevosSegundos = temp.segundos_restantes - 1;
+            await supabase.from('temporizador').update({
+                segundos_restantes: nuevosSegundos
+            }).eq('id', TEMP_ID);
+            console.log(`Tick: ${nuevosSegundos}s restantes`);
+        } else {
+            // Fin partido: guardar resultado y actualizar clasificación
+            // Insertar resultado en Supabase
+            await supabase.from('resultados').insert({
+                equipo1_id: marcador.equipo_local,
+                equipo2_id: marcador.equipo_visitante,
+                marcador1: marcador.marcador_local,
+                marcador2: marcador.marcador_visitante
+            });
 
-      await actualizarClasificacion(marcador);
+            // Obtener nombres de equipos
+            const {
+                data: equipoLocal
+            } = await supabase
+                .from('equipos')
+                .select('name')
+                .eq('id', marcador.equipo_local)
+                .single();
 
-      // Obtener siguiente partido o generar nuevos
-      let { data: siguiente } = await supabase.from('proximos_partidos').select('*').order('id').limit(1);
-      if (!siguiente || siguiente.length === 0) {
-        await generarPartidosAleatorios();
-        siguiente = (await supabase.from('proximos_partidos').select('*').order('id').limit(1)).data;
-      }
+            const {
+                data: equipoVisitante
+            } = await supabase
+                .from('equipos')
+                .select('name')
+                .eq('id', marcador.equipo_visitante)
+                .single();
 
-      // Actualizar marcador y temporizador para el nuevo partido
-      await supabase.from('marcador').update({
-        equipo_local: siguiente[0].equipo1_id,
-        equipo_visitante: siguiente[0].equipo2_id,
-        marcador_local: 0,
-        marcador_visitante: 0
-      }).eq('id', MARCADOR_ID);
+            // Enviar mensaje embed a Discord
+            const webhookURL = 'https://discord.com/api/webhooks/1391386398539382856/A8EGXWhl2SdJHWW7pjz3VFMe1051s3-4B0l77A1M56fa90G3lmonCyQmh-xA8d2PLxMn'; // reemplaza esto
 
-      await supabase.from('temporizador').update({
-        segundos_restantes: TIEMPO_PARTIDO
-      }).eq('id', TEMP_ID);
+            const payload = {
+                embeds: [{
+                    title: '📢 Resultado Final',
+                    color: 0xff0000,
+                    fields: [{
+                            name: equipoLocal.name,
+                            value: marcador.marcador_local.toString(),
+                            inline: true
+                        },
+                        {
+                            name: equipoVisitante.name,
+                            value: marcador.marcador_visitante.toString(),
+                            inline: true
+                        }
+                    ],
+                    timestamp: new Date().toISOString()
+                }]
+            };
 
-      await supabase.from('proximos_partidos').delete().eq('id', siguiente[0].id);
+            await fetch(webhookURL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(payload)
+            });
 
-      console.log('Partido finalizado. Iniciado nuevo partido.');
+
+            await actualizarClasificacion(marcador);
+
+            // Obtener siguiente partido o generar nuevos
+            let {
+                data: siguiente
+            } = await supabase.from('proximos_partidos').select('*').order('id').limit(1);
+            if (!siguiente || siguiente.length === 0) {
+                await generarPartidosAleatorios();
+                siguiente = (await supabase.from('proximos_partidos').select('*').order('id').limit(1)).data;
+            }
+
+            // Actualizar marcador y temporizador para el nuevo partido
+            await supabase.from('marcador').update({
+                equipo_local: siguiente[0].equipo1_id,
+                equipo_visitante: siguiente[0].equipo2_id,
+                marcador_local: 0,
+                marcador_visitante: 0
+            }).eq('id', MARCADOR_ID);
+
+            await supabase.from('temporizador').update({
+                segundos_restantes: TIEMPO_PARTIDO
+            }).eq('id', TEMP_ID);
+
+            await supabase.from('proximos_partidos').delete().eq('id', siguiente[0].id);
+
+            console.log('Partido finalizado. Iniciado nuevo partido.');
+        }
+    } catch (err) {
+        console.error('[TICK ERROR]', err.message || err);
     }
-  } catch (err) {
-    console.error('[TICK ERROR]', err.message || err);
-  }
 }
 
 // --- Actualiza marcador local independientemente cada 2-6 segundos ---
 async function actualizarMarcadorLocal() {
-  try {
-    const { data: temp } = await supabase.from('temporizador').select('*').eq('id', TEMP_ID).single();
-    if (!temp || temp.segundos_restantes <= 5) return;
+    try {
+        const {
+            data: temp
+        } = await supabase.from('temporizador').select('*').eq('id', TEMP_ID).single();
+        if (!temp || temp.segundos_restantes <= 5) return;
 
-    const { data: marcador } = await supabase.from('marcador').select('*').eq('id', MARCADOR_ID).single();
-    if (!marcador) return;
+        const {
+            data: marcador
+        } = await supabase.from('marcador').select('*').eq('id', MARCADOR_ID).single();
+        if (!marcador) return;
 
-    const deltaLocal = Math.floor(Math.random() * 6) - 2;  // [-2..3]
+        const deltaLocal = Math.floor(Math.random() * 6) - 2; // [-2..3]
 
-    await supabase.from('marcador').update({
-      marcador_local: marcador.marcador_local + deltaLocal
-    }).eq('id', MARCADOR_ID);
+        await supabase.from('marcador').update({
+            marcador_local: marcador.marcador_local + deltaLocal
+        }).eq('id', MARCADOR_ID);
 
-    console.log(`Marcador local actualizado: ${marcador.marcador_local + deltaLocal}`);
-  } catch (err) {
-    console.error('[MARCADOR LOCAL ERROR]', err.message || err);
-  }
+        console.log(`Marcador local actualizado: ${marcador.marcador_local + deltaLocal}`);
+    } catch (err) {
+        console.error('[MARCADOR LOCAL ERROR]', err.message || err);
+    }
 }
 
 // --- Actualiza marcador visitante independientemente cada 2-6 segundos ---
 async function actualizarMarcadorVisitante() {
-  try {
-    const { data: temp } = await supabase.from('temporizador').select('*').eq('id', TEMP_ID).single();
-    if (!temp || temp.segundos_restantes <= 5) return;
+    try {
+        const {
+            data: temp
+        } = await supabase.from('temporizador').select('*').eq('id', TEMP_ID).single();
+        if (!temp || temp.segundos_restantes <= 5) return;
 
-    const { data: marcador } = await supabase.from('marcador').select('*').eq('id', MARCADOR_ID).single();
-    if (!marcador) return;
+        const {
+            data: marcador
+        } = await supabase.from('marcador').select('*').eq('id', MARCADOR_ID).single();
+        if (!marcador) return;
 
-    const deltaVisitante = Math.floor(Math.random() * 6) - 2;  // [-2..3]
+        const deltaVisitante = Math.floor(Math.random() * 6) - 2; // [-2..3]
 
-    await supabase.from('marcador').update({
-      marcador_visitante: marcador.marcador_visitante + deltaVisitante
-    }).eq('id', MARCADOR_ID);
+        await supabase.from('marcador').update({
+            marcador_visitante: marcador.marcador_visitante + deltaVisitante
+        }).eq('id', MARCADOR_ID);
 
-    console.log(`Marcador visitante actualizado: ${marcador.marcador_visitante + deltaVisitante}`);
-  } catch (err) {
-    console.error('[MARCADOR VISITANTE ERROR]', err.message || err);
-  }
+        console.log(`Marcador visitante actualizado: ${marcador.marcador_visitante + deltaVisitante}`);
+    } catch (err) {
+        console.error('[MARCADOR VISITANTE ERROR]', err.message || err);
+    }
 }
 
 // --- Función recursiva para actualizar marcador local cada 2-6 segundos ---
 function iniciarActualizacionesMarcadorLocal() {
-  const delay = Math.floor(Math.random() * 5 + 2) * 1000; // 2000 a 6000 ms
-  setTimeout(async () => {
-    await actualizarMarcadorLocal();
-    iniciarActualizacionesMarcadorLocal();
-  }, delay);
+    const delay = Math.floor(Math.random() * 5 + 2) * 1000; // 2000 a 6000 ms
+    setTimeout(async () => {
+        await actualizarMarcadorLocal();
+        iniciarActualizacionesMarcadorLocal();
+    }, delay);
 }
 
 // --- Función recursiva para actualizar marcador visitante cada 2-6 segundos ---
 function iniciarActualizacionesMarcadorVisitante() {
-  const delay = Math.floor(Math.random() * 5 + 2) * 1000; // 2000 a 6000 ms
-  setTimeout(async () => {
-    await actualizarMarcadorVisitante();
-    iniciarActualizacionesMarcadorVisitante();
-  }, delay);
+    const delay = Math.floor(Math.random() * 5 + 2) * 1000; // 2000 a 6000 ms
+    setTimeout(async () => {
+        await actualizarMarcadorVisitante();
+        iniciarActualizacionesMarcadorVisitante();
+    }, delay);
 }
 
 // --- Iniciar todo ---
+async function iniciarTick() {
+    await tick();
+    setTimeout(iniciarTick, 1000); // No se solapa, evita doble decremento
+}
+
 (async () => {
-  await inicializarDatos();
-  setInterval(tick, 1000);
-  iniciarActualizacionesMarcadorLocal();
-  iniciarActualizacionesMarcadorVisitante();
+    await inicializarDatos();
+    iniciarTick(); // reemplaza a setInterval
+    iniciarActualizacionesMarcadorLocal();
+    iniciarActualizacionesMarcadorVisitante();
 })();
 
 app.listen(port, () => {
-  console.log(`Servidor activo en http://localhost:${port}`);
+    console.log(`Servidor activo en http://localhost:${port}`);
 });
