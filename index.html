@@ -141,10 +141,10 @@
          user-select: none;
          min-width: 140px;
          text-align: center;
-		 white-space: nowrap;
-		 text-overflow: ellipsis;
-		 display: inline-block;
-		 padding: 4px 12px;
+         white-space: nowrap;
+         text-overflow: ellipsis;
+         display: inline-block;
+         padding: 4px 12px;
          }
          #temporizador {
          font-size: 22px;
@@ -208,6 +208,11 @@
          height: 32px;
          border-radius: 50%;
          object-fit: cover;
+         }
+         #partido-directo.partido-finalizado {
+         background-color: rgba(120, 0, 0, 0.85); /* Rojo oscuro */
+         box-shadow: 0 0 20px 8px rgba(255, 0, 0, 0.6);
+         transition: background 0.3s, box-shadow 0.3s;
          }
          h2.subtitle {
          color: #eee;
