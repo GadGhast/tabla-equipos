@@ -138,8 +138,12 @@ async function cargarMarcadorYTemporizador() {
 
 // Loop de actualización cada 1s
 async function loop() {
+  await cargarEquipos();
   await cargarMarcadorYTemporizador();
   mostrarPartido();
+  renderClasificacion();
+  renderProximosPartidos();
+  renderHistorial();
 
   // Cambiar fondo si quedan 5 segundos o menos
   const segundos = temporizador?.segundos_restantes ?? 0;
