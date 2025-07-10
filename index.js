@@ -188,14 +188,6 @@ async function tick() {
       // Enviar mensaje embed a Discord
       const webhookURL = 'https://discord.com/api/webhooks/1391386398539382856/A8EGXWhl2SdJHWW7pjz3VFMe1051s3-4B0l77A1M56fa90G3lmonCyQmh-xA8d2PLxMn';
 
-      // Determinar el equipo ganador para usar su imagen
-      let thumbnailUrl = null;
-      if (marcador.marcador_local > marcador.marcador_visitante) {
-        thumbnailUrl = equipoLocal.image_url;
-      } else if (marcador.marcador_visitante > marcador.marcador_local) {
-        thumbnailUrl = equipoVisitante.image_url;
-      }
-
       // Construir el payload del embed
       const payload = {
         embeds: [{
