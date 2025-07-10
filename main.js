@@ -139,6 +139,7 @@ async function cargarMarcadorYTemporizador() {
 // Loop de actualización cada 1s
 async function loop() {
   await cargarEquipos();
+  await generarPartidosSiNoHay();
   await cargarMarcadorYTemporizador();
   mostrarPartido();
   renderClasificacion();
