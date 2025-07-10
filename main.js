@@ -28,15 +28,14 @@ async function generarPartidosSiNoHay() {
     const ids = equipos.map(e => e.id);
     const combinaciones = [];
 
-    // Mezclar aleatoriamente el array de ids
     for (let i = ids.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
       [ids[i], ids[j]] = [ids[j], ids[i]];
     }
 
-    for (let i = 0; i < Math.min(10*2, ids.length - 1); i += 2) {
+    for (let i = 0; i < Math.min(10 * 2, ids.length - 1); i += 2) {
       const equipo1_id = ids[i];
-      const equipo2_id = ids[i+1];
+      const equipo2_id = ids[i + 1];
       combinaciones.push({ equipo1_id, equipo2_id });
     }
 
@@ -47,7 +46,7 @@ async function generarPartidosSiNoHay() {
 // Mostrar clasificación
 function renderClasificacion() {
   tablaClasificacion.innerHTML = '';
-  const ordenados = [...equipos].sort((a,b) => b.puntos - a.puntos);
+  const ordenados = [...equipos].sort((a, b) => b.puntos - a.puntos);
   for (const eq of ordenados) {
     const tr = document.createElement('tr');
     tr.innerHTML = `
@@ -139,14 +138,16 @@ async function cargarMarcadorYTemporizador() {
 
 // Loop de actualización cada 1s
 async function loop() {
-  await cargarEquipos();
-  await generarPartidosSiNoHay();
   await cargarMarcadorYTemporizador();
-
   mostrarPartido();
-  renderClasificacion();
-  renderProximosPartidos();
-  renderHistorial();
+
+  // Cambiar fondo si quedan 5 segundos o menos
+  const segundos = temporizador?.segundos_restantes ?? 0;
+  if (segundos <= 5) {
+    partidoEl.classList.add('partido-finalizado');
+  } else {
+    partidoEl.classList.remove('partido-finalizado');
+  }
 }
 
 async function init() {
