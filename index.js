@@ -191,8 +191,8 @@ async function tick() {
       // Construir el payload del embed
       const payload = {
         embeds: [{
-          title: `${equipoLocal.name} vs ${equipoVisitante.name}`,
-          description: `## - ${marcador.marcador_local} : ${marcador.marcador_visitante}`,
+          title: `**${equipoLocal.name} - ${equipoVisitante.name}**`,
+          description: `**${marcador.marcador_local} : ${marcador.marcador_visitante}**`,
           color: 65321,
           ...(thumbnailUrl ? {
             thumbnail: {
