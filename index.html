@@ -52,19 +52,19 @@
     thead th {
       background: #3a006f;
       letter-spacing: 2px;
-      font-size: 1.4rem;
+      font-size: 0.7rem;
       text-transform: uppercase;
       border-bottom: 2px solid #8a2be2;
     }
 
     tbody td:nth-child(1),
     thead th:nth-child(1) {
-      font-size: 1.2rem;
+      font-size: 0.7rem;
     }
 
     tbody td:nth-child(2),
     thead th:nth-child(2) {
-      font-size: 1.2rem;
+      font-size: 0.7rem;
     }
 
     tbody tr:nth-child(odd) {
@@ -164,14 +164,22 @@
     }
 
     #temporizador {
-      font-size: 28px;
+      font-size: 20px;
       font-weight: 700;
       text-align: center;
-      margin-bottom: 40px;
+      margin-bottom: 20px;
       color: #ff77ff;
       text-shadow: 0 0 10px #6a22b8;
       user-select: none;
+      padding: 12px 24px;
+      border-radius: 12px;
+      background: rgba(50, 0, 70, 0.5);
+      box-shadow: 0 0 15px #8a2be2;
+      width: fit-content;
+      margin-left: auto;
+      margin-right: auto;
     }
+
 
     #proximos-partidos, #historial-resultados {
       list-style: none;
@@ -272,13 +280,13 @@
 
     <div class="tablas-secundarias">
       <div class="proximos">
-        <h2 class="subtitle">Próximos Partidos</h2>
+        <h2 class="subtitle"></h2>
         <ul id="proximos-partidos">
           <!-- Lista próxima jornada -->
         </ul>
       </div>
       <div class="historial">
-        <h2 class="subtitle">Historial de Resultados</h2>
+        <h2 class="subtitle"></h2>
         <ul id="historial-resultados">
           <!-- Resultados pasados -->
         </ul>
