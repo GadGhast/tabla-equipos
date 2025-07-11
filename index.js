@@ -220,7 +220,7 @@ async function tick() {
       let {
         data: siguiente
       } = await supabase.from('proximos_partidos').select('*').order('id').limit(1);
-      if (!siguiente || siguiente.length <= 1) {
+      if (!siguiente || siguiente.length < 1) {
 		await generarPartidosAleatorios();
 		// Esperar unos milisegundos por si hay un pequeño delay de escritura
 		await new Promise(resolve => setTimeout(resolve, 300));
