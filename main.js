@@ -21,28 +21,6 @@ async function cargarEquipos() {
   if (data) equipos = data;
 }
 
-// Generar 10 partidos si no existen
-async function generarPartidosSiNoHay() {
-  const { data } = await supabase.from('proximos_partidos').select('*').limit(1);
-  if (!data || data.length === 0) {
-    const ids = equipos.map(e => e.id);
-    const combinaciones = [];
-
-    for (let i = ids.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [ids[i], ids[j]] = [ids[j], ids[i]];
-    }
-
-    for (let i = 0; i < Math.min(10 * 2, ids.length - 1); i += 2) {
-      const equipo1_id = ids[i];
-      const equipo2_id = ids[i + 1];
-      combinaciones.push({ equipo1_id, equipo2_id });
-    }
-
-    await supabase.from('proximos_partidos').insert(combinaciones);
-  }
-}
-
 // Mostrar clasificación
 function renderClasificacion() {
   tablaClasificacion.innerHTML = '';
@@ -139,7 +117,6 @@ async function cargarMarcadorYTemporizador() {
 // Loop de actualización cada 1s
 async function loop() {
   await cargarEquipos();
-  await generarPartidosSiNoHay();
   await cargarMarcadorYTemporizador();
   mostrarPartido();
   renderClasificacion();
@@ -157,7 +134,6 @@ async function loop() {
 
 async function init() {
   await cargarEquipos();
-  await generarPartidosSiNoHay();
   await cargarMarcadorYTemporizador();
 
   mostrarPartido();
