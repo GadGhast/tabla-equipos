@@ -70,32 +70,32 @@ async function inicializarDatos() {
 
 // --- Genera 10 partidos aleatorios únicos ---
 async function generarPartidosAleatorios() {
-  const {
-    data: equipos
-  } = await supabase.from('equipos').select('id');
+  const { data: equipos } = await supabase.from('equipos').select('id');
+  if (!equipos || equipos.length < 20) {
+    console.log('No hay suficientes equipos para generar partidos únicos.');
+    return;
+  }
+
+  // Mezclar aleatoriamente los IDs de equipos
   const ids = equipos.map(e => e.id);
+  for (let i = ids.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [ids[i], ids[j]] = [ids[j], ids[i]];
+  }
+
+  // Formar 10 partidos con equipos únicos
   const partidos = [];
-  const usados = new Set();
-
-  while (partidos.length < 10 && usados.size < ids.length * ids.length) {
-    const e1 = ids[Math.floor(Math.random() * ids.length)];
-    let e2 = ids[Math.floor(Math.random() * ids.length)];
-    while (e1 === e2) e2 = ids[Math.floor(Math.random() * ids.length)];
-    const key = [e1, e2].sort().join('-');
-    if (!usados.has(key)) {
-      partidos.push({
-        equipo1_id: e1,
-        equipo2_id: e2
-      });
-      usados.add(key);
-    }
+  for (let i = 0; i < 20; i += 2) {
+    partidos.push({
+      equipo1_id: ids[i],
+      equipo2_id: ids[i + 1]
+    });
   }
 
-  if (partidos.length > 0) {
-    await supabase.from('proximos_partidos').insert(partidos);
-    console.log(`Se generaron ${partidos.length} partidos nuevos.`);
-  }
+  await supabase.from('proximos_partidos').insert(partidos);
+  console.log(`Se generaron ${partidos.length} partidos únicos sin repetir equipos.`);
 }
+
 
 // --- Actualiza clasificación según el resultado ---
 async function actualizarClasificacion(marcador) {
@@ -221,9 +221,12 @@ async function tick() {
         data: siguiente
       } = await supabase.from('proximos_partidos').select('*').order('id').limit(1);
       if (!siguiente || siguiente.length === 0) {
-        await generarPartidosAleatorios();
-        siguiente = (await supabase.from('proximos_partidos').select('*').order('id').limit(1)).data;
-      }
+		await generarPartidosAleatorios();
+		// Esperar unos milisegundos por si hay un pequeño delay de escritura
+		await new Promise(resolve => setTimeout(resolve, 300));
+		const { data: nuevos } = await supabase.from('proximos_partidos').select('*').order('id').limit(1);
+		siguiente = nuevos;
+	  }
 
       // Actualizar marcador y temporizador para el nuevo partido
       await supabase.from('marcador').update({
