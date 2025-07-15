@@ -14,7 +14,7 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
 const TEMP_ID = 1;
 const MARCADOR_ID = 1;
-const TIEMPO_PARTIDO = 1200;
+const TIEMPO_PARTIDO = 900;
 
 // --- Servir archivos estáticos ---
 app.get('/index.html', (req, res) => {
