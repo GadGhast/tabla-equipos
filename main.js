@@ -55,7 +55,7 @@ async function renderProximosPartidos() {
 
 // Mostrar historial resultados
 async function renderHistorial() {
-  const { data } = await supabase.from('resultados').select('*').order('id', { ascending: false }).limit(10);
+  const { data } = await supabase.from('resultados').select('*').order('id', { ascending: false }).limit(1000);
   listaHistorial.innerHTML = '';
   if (!data || data.length === 0) {
     const li = document.createElement('li');
